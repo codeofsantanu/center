@@ -1,0 +1,2178 @@
+using KENCloudAdmin.APIService;
+using KENCloudAdmin.APIService.MOBAPI;
+
+using KENCloudAdmin.Models;
+using KENCloudAdmin.Models.ViewModel;
+using Kendo.Mvc.Extensions;
+using Kendo.Mvc.UI;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Security;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
+using System.Text.RegularExpressions;
+using StackExchange.Redis;
+using KENCloudAdmin.Utils;
+using Microsoft.Azure.ActiveDirectory.GraphClient;
+using KENCloudAdmin.APIService.Group;
+using System.Collections;
+using System.Net.NetworkInformation;
+using System.Configuration;
+using KENCloudAdmin.APIService.CommonService;
+using System.Data.Entity.Core.Objects;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage;
+using System.Diagnostics;
+using System.IO;
+using KENCloudAdmin.APIService.SwashAdmin.SubscriptionLicensing;
+using KENCloudAdmin.APIService.TanenetLicense;
+using KENCloudAdmin.APIService.SwashAdmin;
+using KENCloudAdmin.APIService.MOBAPISubscriptionLicense;
+using KENCloudAdmin.Models.Subscription_Licensing;
+
+namespace KENCloudAdmin.Areas.ClientAdmin.Controllers
+{
+    public class User1
+    {
+        public int Userid { get; set; }
+        public string UserName { get; set; }
+        public string UserDesignation { get; set; }
+        public string UserEmailId { get; set; }
+        public string UserRole { get; set; }
+        public string UserStatus { get; set; }
+        public string ImgUrl { get; set; }
+        public string IsActive { get; set; }
+        public string IsBlocked { get; set; }
+        public string IsLicense { get; set; }
+
+
+
+    }
+    public class UserListController : Controller
+    {
+
+        int tanentId, regId = 0;
+        HttpClient client = new HttpClient();
+        HttpResponseMessage skill = null;
+
+        private SendOTPToStorageQueueService obj = new SendOTPToStorageQueueService();
+
+        public List<RegisterLogin> reglogin = new List<RegisterLogin>();
+        public UserListController()
+        {
+            InitializeStorage();
+            var url = ConfigurationManager.AppSettings["ida:ApiUrl"];
+            // var url = "https://localhost:44355/api/";
+            client.BaseAddress = new Uri(url);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+        // GET: ClientAdmin/UserList
+        //[ValidateAntiForgeryToken]
+        public async Task<ActionResult> Index()
+        {
+
+            ViewBag.MyString = RandonNo();
+
+            if (Session["TanentId"] != null && Session["RegId"] != null)
+            {
+                tanentId = Convert.ToInt32(Session["TanentId"]);
+                regId = Convert.ToInt32(Session["RegId"]);
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index", "SingleSignOn", new { area = "CustomizedLogin" });
+
+            }
+            //return View();
+        }
+        public string RandonNo()
+        {
+            int len = 8;
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder res = new StringBuilder();
+            Random rnd = new Random();
+            while (0 < len--)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+            }
+            return res.ToString();
+        }
+
+        public int MailSend(string maildata, string password)
+        {
+            //int randomNumber = RandomNumberGeneration.GeneratefourdigitRandomNum();
+            //obj.MailSendDetails("224", "satyabrata@kencloud.co.in", "hare.b@kencloud.co.in", "Hi Your OTP is " + " " + randomNumber + "" + "Please not share this any one.", false);
+            obj.MailSendDetails("224", "satyabrata@kencloud.co.in", maildata, "Hi " + maildata + ". Your Password for Kencloud is " + " " + password + "" + ".  Please not share this any one.", false);
+            // Session["OtpFormail"] = null;
+            // Session["OtpFormail"] = randomNumber;
+            return 1;
+        }
+        public void deleteCache()
+        {
+            cache.KeyDelete("cacheMasterUserRegistration");
+            cache.KeyDelete("cacheTanentUserRole");
+            cache.KeyDelete("cacheTanentUserList");
+            cache.KeyDelete("cacheMasterLoginUser");
+            cache.KeyDelete("cacheMaster_Tanent");
+
+        }
+        public string dateDifference(string yy)
+        {
+            if (yy == null)
+            {
+                return null;
+            }
+            else
+            {
+                int[] monthDay = new int[12] { 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+                DateTime fromDate;
+                DateTime toDate;
+                int year;
+                int month;
+                int day;
+                DateTime dt = Convert.ToDateTime(yy);
+                if (DateTime.Now > dt)
+                {
+                    toDate = DateTime.Now;
+                    fromDate = dt;
+                }
+                else
+                {
+                    fromDate = DateTime.Now;
+                    toDate = dt;
+                }
+                int increment = 0;
+                if (fromDate.Day > toDate.Day)
+                {
+                    increment = monthDay[fromDate.Month - 1];
+                }
+                if (increment == -1)
+                {
+                    if (DateTime.IsLeapYear(fromDate.Year))
+                    {
+                        increment = 29;
+                    }
+                    else
+                    {
+                        increment = 28;
+                    }
+                }
+                if (increment != 0)
+                {
+                    day = (toDate.Day + increment) - fromDate.Day;
+                    increment = 1;
+                }
+                else
+                {
+                    day = toDate.Day - fromDate.Day;
+                }
+                if ((fromDate.Month + increment) > toDate.Month)
+                {
+                    month = (toDate.Month + 12) - (fromDate.Month + increment);
+                    increment = 1;
+                }
+                else
+                {
+                    month = (toDate.Month) - (fromDate.Month + increment);
+                    increment = 0;
+                }
+                year = toDate.Year - (fromDate.Year + increment);
+                if (year > 100)
+                {
+                    year = 0;
+                    day = 0;
+                }
+                day = (month * 30) + day;
+                return year + " Years, " + /*month + " month(s), " +*/ day + " days";
+            }
+
+        }
+        //public string datediff(string xx)
+        //{
+        //    var dateOne = DateTime.Now;
+        //    var ba = Convert.ToDateTime(xx);
+        //    var diff = dateOne.Subtract(ba);
+        //    string res = String.Format("{0}:{1}:{2}:{3}", diff.diff.Days, diff.Hours, diff.Minutes);
+        //    string[] values = res.Split(':');
+        //    int day = Convert.ToInt32(values[0]);
+        //    int hr = Convert.ToInt32(values[1]);
+        //    int min = Convert.ToInt32(values[2]);
+        //    string data = "";
+
+        //    if (day == 0 && hr == 0 && min == 0)
+        //    {
+        //        data = "just now";
+
+        //    }
+        //    else if (day == 0 && hr == 0 && min != 0)
+        //    {
+        //        data = min + " " + "min ago";
+
+        //    }
+        //    else if (day == 0 && hr != 0)
+        //    {
+        //        data = hr + " " + "hr ago";
+
+        //    }
+        //    else if (day != 0)
+        //    {
+        //        data = day + " " + "day ago";
+
+        //    }
+
+        //    return data;
+        //}
+
+        //public async Task<string> Userimage(string id)
+        //{
+
+        //    //var getProfilePic = new GetProfilePhotoService();
+
+        //    //var photo = await getProfilePic.GetProfilePicAsync();
+        //    //var data = (from a in photo where a.User_RegistrationId == Convert.ToInt32(id) select new { a.Uplaod_ImageURL }).FirstOrDefault();
+        //    //if (data != null)
+        //    //{
+        //    //    im = data.Uplaod_ImageURL.ToString();
+        //    //}
+        //    //else
+        //    //{
+        //    string im = "/images/profile.png";
+        //    // }
+        //    return im.ToString();
+        //}
+
+        [HttpPost]
+        public async Task<ActionResult> BindGrid([DataSourceRequest]DataSourceRequest request, string parentid, string searchval)
+        {
+            if (searchval == "0")
+            {
+                searchval = "";
+            }
+            tanentId = Convert.ToInt32(Session["tanentId"]);
+            // Session["tanentId"]
+            var getuserlist = new GetUserListService();
+            var getProfilePic = new GetProfilePhotoService();
+            var userHistory = new MasterLoginHistoryService();
+            var designation = new MasterDesignationService();
+
+            var photo = await getProfilePic.GetProfilePicAsync();
+            var data = await getuserlist.GetUsersListByIdAsync(tanentId);
+            var historyData = await userHistory.GetMasterLoginHistorysAsync();
+            var alldesignation = await designation.GetMasterDesignationAsync();
+            //var dlist = from g in alldesignation join h in data on g.Designation_Id equals h.Designation_Id select new { g.Designation_Name, h.User_DisplayName };
+
+            var userlist = (from a in data
+                            join c in photo on a.User_RegistrationId equals c.User_RegistrationId
+
+                            //where (a.User_First_Name).ToLower().Contains(searchval.ToLower() ?? string.Empty)
+                            //|| (a.User_Last_Name).ToLower().Contains(searchval.ToLower() ?? string.Empty)
+                            let FirstAccess =
+                              (from d in historyData
+                               where d.User_RegistrationId == a.User_RegistrationId
+                               select d.User_LogInDate).FirstOrDefault()
+                            //let designati = (from g in alldesignation
+                            //                 where g.Designation_Id == a.Designation_Id
+                            //                 select g.Designation_Name).FirstOrDefault()
+                            let LastAccess =
+                         (from d in historyData
+                          where d.User_RegistrationId == a.User_RegistrationId
+                          select d.User_LogInDate).LastOrDefault()
+
+                            //let FirstAccess1 = FirstAccess == null ? LastAccess : null
+
+
+                            //let diffFromFirst = (from x in FirstAccess
+                            //                     where EntityFunctions.DiffDays(Convert.ToDateTime(x), System.DateTime.Now) == 0
+                            //                     select x)
+                            //let diffFromLast = (from y in LastAccess
+                            //                    where EntityFunctions.DiffDays(Convert.ToDateTime(y), System.DateTime.Now) == 0
+                            //                    select y)
+
+                            select new
+                            {
+                                // Uplaod_ImageURL1 = Userimage(a.User_RegistrationId.ToString()),
+                                a.User_RegistrationId,
+                                a.Is_Cleint_Super_Admin,
+                                a.Is_Cleint_User_Admin,
+                                a.User_DisplayName,
+                                a.User_First_Name,
+                                a.User_Last_Name,
+                                a.User_EmailId,
+                                a.InsertedOn,
+                                a.User_MobileNo,
+                                a.Designation_Id,
+                                a.User_JobTitle,
+                                a.Tanent_UserListId,
+                                a.ReportingAuthorityId,
+                                a.IsUserNoAdminstratorAccess,
+                                a.IsGlobalAdminStrator,
+                                a.IsCustomizedAdminStrator,
+                                a.Check_IsBillingAdmin,
+                                a.Check_IsPasswordAdmin,
+                                a.Check_ServiceAdmin,
+                                a.Check_UserManagementAdmin,
+                                a.availabilityStatus,
+                                a.Tanent_Name,
+                                a.Login_User_Status,
+                                a.Is_Licensed,
+                                a.Is_Blocked_signIn,
+                                c.Uplaod_ImageURL,
+                                a.Country_Id,
+                                a.User_CityName,
+                                a.State_Id,
+                                a.User_ZipCode,
+                                a.User_OfficeLocation,
+                                //b.Designation_Name,
+                                FirstAccess,
+                                LastAccess,
+                                GapFirstDate = dateDifference(FirstAccess),
+                                GapLastDate = dateDifference(LastAccess),
+                                designati = (from x in alldesignation
+                                             where
+                    x.Designation_Id == a.Designation_Id
+                                             select x.Designation_Name).FirstOrDefault(),
+                                Adminstatus = a.IsUserNoAdminstratorAccess == true ? "No Admin" : a.IsGlobalAdminStrator == true ? "Global Admin" : "Customized Admin"
+
+                            }).ToList();
+            //ViewBag.domainName = userlist[0].Tanent_Name;
+            //TempData["domainName"] = userlist[0].Tanent_Name;
+            //TempData.Keep();
+            Session["domainName"] = userlist[0].Tanent_Name;
+
+            var listCompany = userlist;
+            List<UserListViewModel> objCmp = new List<UserListViewModel>();
+            if (Convert.ToInt32(parentid) == 1)
+            {
+                listCompany = userlist.ToList().Where(a => a.Login_User_Status == "Active" && a.Is_Blocked_signIn == false).ToList();
+
+            }
+            else if (Convert.ToInt32(parentid) == 2)
+            {
+                listCompany = userlist.ToList().Where(a => a.Login_User_Status == "Deactive").ToList();
+
+            }
+            else if (Convert.ToInt32(parentid) == 3)
+            {
+                listCompany = userlist.ToList().Where(a => a.Is_Blocked_signIn == true || a.Login_User_Status == "Deactive").ToList();
+
+            }
+            else if (Convert.ToInt32(parentid) == 4)
+            {
+                listCompany = userlist.ToList().Where(a => a.Is_Licensed == true).ToList();
+
+            }
+            else if (Convert.ToInt32(parentid) == 5)
+            {
+                listCompany = userlist.ToList().Where(a => a.Is_Licensed == false).ToList();
+            }
+            else
+            {
+                listCompany = userlist.ToList();
+            }
+            if (searchval != "")
+            {
+                listCompany = listCompany.Where(a => a.User_First_Name.ToLower().Contains(searchval.ToLower() ?? string.Empty) || a.User_Last_Name.ToLower().Contains(searchval.ToLower() ?? string.Empty)).ToList();
+                if (listCompany.Count == 0)
+                {
+                    listCompany = userlist.ToList();
+                }
+            }
+            return Json(listCompany.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public async Task<ActionResult> ShowAddUserData([DataSourceRequest] DataSourceRequest request)
+        {
+            int regid = 0;
+            regid = Convert.ToInt32(Session["RegId"]);
+            var RegService = new UserRegistrationService();
+            var getProfilePic = new GetProfilePhotoService();
+            var photo = await getProfilePic.GetProfilePicAsync();
+            var data = await RegService.GetMasterUserRegistrationsAsync();
+            var userlist = (from a in data
+                            join c in photo on a.User_RegistrationId equals c.User_RegistrationId
+                            where a.User_RegistrationId == regid
+                            select new
+                            {
+                                a.User_RegistrationId,
+                                a.User_EmailId,
+                                a.User_First_Name,
+                                a.User_Last_Name,
+                                c.Uplaod_ImageURL,
+
+                            }).ToList();
+
+
+            return Json(userlist, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public async Task<ActionResult> ShowMailPic([DataSourceRequest]DataSourceRequest request, string emailid)
+        {
+            tanentId = Convert.ToInt32(Session["tanentId"]);
+            var getuserlist = new GetUserListService();
+            //var RegService = new UserRegistrationService();
+            var getProfilePic = new GetProfilePhotoService();
+            var getDesig = new MasterDesignationService();
+            var data = await getuserlist.GetUsersListByIdAsync(tanentId);
+            // var data = await RegService.GetMasterUserRegistrationsAsync();
+            var photo = await getProfilePic.GetProfilePicAsync();
+            var alldesignation = await getDesig.GetMasterDesignationAsync();
+            var userlist = (from a in data
+                            join c in photo on a.User_RegistrationId equals c.User_RegistrationId
+                            select new
+                            {
+                                // Uplaod_ImageURL1 = Userimage(a.User_RegistrationId.ToString()),
+                                a.User_RegistrationId,
+                                a.User_EmailId,
+                                a.User_First_Name,
+                                a.User_Last_Name,
+                                c.Uplaod_ImageURL,
+                                designati = (from x in alldesignation
+                                             where
+                    x.Designation_Id == a.Designation_Id
+                                             select x.Designation_Name).FirstOrDefault(),
+
+                            }).ToList();
+            var urlist = userlist;
+            string[] myArray = new string[4];
+            ArrayList array = new ArrayList();
+            List<UserListViewModel> objCmp = new List<UserListViewModel>();
+            if (emailid != null)
+            {
+
+                var myarray = emailid.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+                    if (myarray[i] != "null")
+                    {
+                        var item = myarray[i];
+                        array.Add(userlist.ToList().Where(a => a.User_EmailId == item).ToList());
+
+                    }
+
+
+                }
+            }
+            return Json(array, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public async Task<ActionResult> GetReportingAuthorityById([DataSourceRequest]DataSourceRequest request, string rid)
+        {
+            var RegService = new UserRegistrationService();
+            var widgetReg = await RegService.GetMasterUserRegistrationsAsync();
+            var data = widgetReg.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(rid)).FirstOrDefault();
+
+            //var getReguserlist = new UserRegistrationService();
+
+            //var data = await getReguserlist.GetMasterUserRegistrationsByIdAsync(Convert.ToInt32(rid));
+            //var data1 = data.Where(a => a.User_RegistrationId == Convert.ToInt32(rid)).FirstOrDefault().User_First_Name;
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        //[HttpPost]
+        //public async Task<ActionResult> DeactiveById([DataSourceRequest]DataSourceRequest request, string dataval)
+        //{
+        //    // deleteCache();
+        //    //if (Session["TanentId"] != null && Session["RegId"] != null)
+        //    //{
+        //    //    tanentId = Convert.ToInt32(Session["TanentId"]);
+        //    //    regId = Convert.ToInt32(Session["RegId"]);
+        //    //}
+        //    if (Session["TanentId"] != null)
+        //    {
+        //        tanentId = Convert.ToInt32(Session["TanentId"]);
+        //        var userListService = new TanentUserListService();
+        //        var widgetUserList = await userListService.GetTanentUserListAsync();
+        //        var data = widgetUserList.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(dataval) && a.TenentId == tanentId).FirstOrDefault();
+        //        var userListId = data.Tanent_UserListId;
+        //        data.Login_User_Status = "Deactive";
+        //        HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userListId, data).Result;
+        //        if (res1.IsSuccessStatusCode)
+        //        {
+        //        }
+
+        //        return Json(data, JsonRequestBehavior.AllowGet);
+        //    }
+        //    else
+        //    {
+        //        return Json(0);
+        //    }
+        //}
+
+        [HttpPost]
+        public async Task<ActionResult> ActiveByIds([DataSourceRequest]DataSourceRequest request, string dataval)
+        {
+            // deleteCache();
+            // deleteCache();
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+
+           // string[] myArray = new string[4];
+            if (dataval != null)
+            {
+
+                var myarray = dataval.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+
+                    var item = myarray[i];
+                    int regId = Convert.ToInt32(item);
+
+                    var userListService = new TanentUserListService();
+                    var widgetUserList = await userListService.GetTanentUserListAsync();
+                    var data = widgetUserList.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == tanentId).FirstOrDefault();
+                    var userListId = data.Tanent_UserListId;
+                    data.Login_User_Status = "Active";
+                    data.Is_Blocked_signIn = false;
+                    HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userListId, data).Result;
+                    if (res1.IsSuccessStatusCode)
+                    {
+
+                    }
+
+                }
+
+            }
+            else
+            {
+
+            }
+
+            return Json(dataval, JsonRequestBehavior.AllowGet);
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> DeactiveByIds([DataSourceRequest]DataSourceRequest request, string dataval)
+        {
+            // deleteCache();
+            if (Session["TanentId"] != null)
+            {
+                tanentId = Convert.ToInt32(Session["TanentId"]);
+
+
+               // string[] myArray = new string[4];
+                if (dataval != null)
+                {
+
+                    var myarray = dataval.Split(',');
+
+                    for (var i = 0; i < myarray.Length; i++)
+                    {
+
+                        var item = myarray[i];
+                        int regId = Convert.ToInt32(item);
+                        var userListService = new TanentUserListService();
+                        var widgetUserList = await userListService.GetTanentUserListAsync();
+                        var data = widgetUserList.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == tanentId).FirstOrDefault();
+                        var userListId = data.Tanent_UserListId;
+                        data.Login_User_Status = "Deactive";
+                        data.Is_Blocked_signIn = true;
+                        HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userListId, data).Result;
+                        if (res1.IsSuccessStatusCode)
+                        {
+
+                        }
+
+                    }
+
+                }
+                else
+                {
+
+                }
+
+                return Json(dataval, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+
+            }
+        }
+
+
+        //completed
+        public async Task<ActionResult> BlockUserById([DataSourceRequest]DataSourceRequest request, string rid)
+        {
+            // deleteCache();
+
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+            var userList = new TanentUserListService();
+            var widgetuserlist = await userList.GetTanentUserListAsync();
+            var data = widgetuserlist.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(rid) && a.TenentId == tanentId).FirstOrDefault();
+            var userlistId = data.Tanent_UserListId;
+            data.Is_Blocked_signIn = true;
+            HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userlistId, data).Result;
+            if (res1.IsSuccessStatusCode)
+            {
+                return Json(data, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+
+        }
+
+        public async Task<ActionResult> UnlicensedById([DataSourceRequest]DataSourceRequest request, string rid)
+        {
+            // deleteCache();
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+            //string[] myArray = new string[10];
+            if (rid != null)
+            {
+                var myarray = rid.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+                    var item = myarray[i];
+                    int regId = Convert.ToInt32(item);
+                    tanentId = Convert.ToInt32(Session["TanentId"]);
+
+                        var TanentUserLicSubObj = new MasterTanentUserLicenseSubscriptionService();
+                        var widgetTanentUserLicSub = await TanentUserLicSubObj.GetMasterTanentUserListAsync();
+                        var data1 = widgetTanentUserLicSub.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == Convert.ToInt32(tanentId) && a.IsActive == true && a.IsDelete == false).ToList();
+                    HttpResponseMessage res2;
+                    int count=0;
+                    for (int j=0; j< data1.Count; j++)
+                    {
+                        data1[j].IsActive = false;
+                        data1[j].IsDelete = true;
+                       res2 = client.PutAsJsonAsync("MasterTanentUserLicenseSubscription/" + Convert.ToInt32(data1[j].TanentLicenseSubscriptionId), data1[j]).Result;
+                        count= count + 1;
+                    }
+                       
+                        if (count>0)
+                        {
+                        //return Json(rid, JsonRequestBehavior.AllowGet);
+                    }
+                        else
+                        {
+                            return Json(0);
+                        }
+                }
+                return Json(rid, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+
+        }
+
+        //completed
+        public async Task<ActionResult> BlockUserByIds([DataSourceRequest]DataSourceRequest request, string dataval)
+        {
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+            // deleteCache();
+            string[] myArray = new string[10];
+            if (dataval != null)
+            {
+
+                var myarray = dataval.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+
+                    var item = myarray[i];
+                    int regId = Convert.ToInt32(item);
+
+                    var userlogin = new TanentUserListService();
+                    var widgetusers = await userlogin.GetTanentUserListAsync();
+                    var data = widgetusers.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == tanentId).FirstOrDefault();
+                    var userListId = data.Tanent_UserListId;
+                    data.Is_Blocked_signIn = true;
+                    HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userListId, data).Result;
+                    if (res1.IsSuccessStatusCode)
+                    {
+
+                    }
+                }
+                return Json(dataval, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+
+
+        //completed
+        public async Task<ActionResult> UnblockByIds([DataSourceRequest]DataSourceRequest request, string dataval)
+        {
+
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+
+            // deleteCache();
+            string[] myArray = new string[10];
+            if (dataval != null)
+            {
+
+                var myarray = dataval.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+
+                    var item = myarray[i];
+                    int regId = Convert.ToInt32(item);
+
+                    var userlogin = new TanentUserListService();
+                    var widgetusers = await userlogin.GetTanentUserListAsync();
+                    var data = widgetusers.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == tanentId).FirstOrDefault();
+                    var userListId = data.Tanent_UserListId;
+                    data.Is_Blocked_signIn = false;
+                    HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userListId, data).Result;
+                    if (res1.IsSuccessStatusCode)
+                    {
+
+                    }
+                }
+                return Json(dataval, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+
+        #region Anita adduser and edit
+
+        #region update 
+        [HttpPost]
+        public async Task<ActionResult> UploadFiles()
+        {
+            CloudBlockBlob imageBlob = null;
+
+            if (Request.Files.Count > 0)
+            {
+                HttpFileCollectionBase files = Request.Files;
+                HttpPostedFileBase filesUpload = files[0];
+                if (filesUpload != null && filesUpload.ContentLength != 0)
+                {
+                    imageBlob = await UploadAndSaveBlobAsync(filesUpload);
+                    Session["imageBlob"] = imageBlob.Uri.ToString();
+                }
+                return Json(1);
+            }
+            else
+            {
+                return Json("No files selected.");
+            }
+        }
+        #endregion
+        #region Blob Declaretion
+        //private ContosoAdsContext db = new ContosoAdsContext();
+        public CloudQueue thumbnailRequestQueue;
+        public static CloudBlobContainer imagesBlobContainer;
+
+        public void InitializeStorage()
+        {
+            // Open storage account using credentials from .cscfg file.
+            var storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["AzureWebJobsDashboard"].ToString());
+
+            // Get context object for working with blobs, and 
+            // set a default retry policy appropriate for a web user interface.
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            //blobClient.DefaultRequestOptions.RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(3), 3);
+
+            // Get a reference to the blob container.
+            imagesBlobContainer = blobClient.GetContainerReference("clienttest");
+
+            // Get context object for working with queues, and 
+            // set a default retry policy appropriate for a web user interface.
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+            //queueClient.DefaultRequestOptions.RetryPolicy = new LinearRetry(TimeSpan.FromSeconds(3), 3);
+
+            // Get a reference to the queue.
+            thumbnailRequestQueue = queueClient.GetQueueReference("thumbnailrequest");
+        }
+        [HttpPost]
+        //For Logo Image
+        public async Task<ActionResult> UploadImageAsyn(HttpPostedFileBase filesUpload)
+        {
+            CloudBlockBlob imageBlob = null;
+
+            if (filesUpload != null && filesUpload.ContentLength != 0)
+            {
+
+                imageBlob = await UploadAndSaveBlobAsync(filesUpload);
+                Session["imageBlob"] = imageBlob.Uri.ToString();
+                // string ss=imageBlob.Uri.ToString();
+            }
+            return View();
+        }
+        //for Backgroun Image 
+
+        private async Task<CloudBlockBlob> UploadAndSaveBlobAsync(HttpPostedFileBase imageFile)
+        {
+            Trace.TraceInformation("Uploading image file {0}", imageFile.FileName);
+
+            string blobName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            // Retrieve reference to a blob. 
+            CloudBlockBlob imageBlob = imagesBlobContainer.GetBlockBlobReference(blobName);
+            // Create the blob by uploading a local file.
+            using (var fileStream = imageFile.InputStream)
+            {
+                await imageBlob.UploadFromStreamAsync(fileStream);
+            }
+
+            Trace.TraceInformation("Uploaded image file to {0}", imageBlob.Uri.ToString());
+
+            return imageBlob;
+        }
+        #endregion
+        public async Task<ActionResult> usergroup(string idd)
+        {
+            var GroupService = new MasterGroupService();
+            var widgetGroup = await GroupService.GetMasterGroupAsync();
+            var GroupdService = new MasterGroupDetailService();
+            var widgetGroupd = await GroupdService.GetMasterGroupDetailAsync();
+
+
+            var data = (from a in widgetGroup.ToList() join b in widgetGroupd.ToList() on a.Group_Id equals b.Group_Id where b.Group_UserId == Convert.ToInt32(idd) select a.Group_Name).ToList();
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        IDatabase cache = RadisCacheService.Connection.GetDatabase();
+        public void ClearCachedTeams()
+        {
+            cache.KeyDelete("cacheMasterUserRegistration");
+            cache.KeyDelete("cacheMaster_Tanent");
+            cache.KeyDelete("cacheTanentUserRole");
+            cache.KeyDelete("cacheTanentUserList");
+            cache.KeyDelete("cacheMasterLoginUser");
+        }
+
+
+
+
+        public async Task<ActionResult> BindAuto([DataSourceRequest]DataSourceRequest request)
+        {
+            var GroupService = new MasterGroupService();
+            var widgetGroup = await GroupService.GetMasterGroupAsync();
+            //   var data = widgetGroup.ToList();
+
+            var data = (from a in widgetGroup.ToList() select new { UserName = a.Group_Name }).ToList();
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+        public async Task<ActionResult> StateNameBind1([DataSourceRequest]DataSourceRequest req, int text)
+        {
+            try
+            {
+                //int id = Convert.ToInt32(Session["id"]);
+                var state = new MasterStateService();
+                var data = await state.GetMasterStateAsync();
+                var stateList = (from b in data
+                                 where b.Country_Id == text
+                                 select new
+                                 {
+                                     State_Id = b.State_Id,
+                                     State_Name = b.State_Name,
+                                     State_Code = b.State_Code,
+                                 }).ToList();
+                if (stateList.Count() > 0)
+                {
+                    return Json(stateList, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Createuser(string FirstName, string LastName, string Displayname, string UserId, string Address1, string Address2, string Designation, string Authority, string Mobile, string State, string City, string Country, string Zipcode, string assignRole, Array Rolearray, string password)
+        {
+
+            if (Session["TanentId"] != null && Session["RegId"] != null)
+            {
+                tanentId = Convert.ToInt32(Session["TanentId"]);
+                regId = Convert.ToInt32(Session["RegId"]);
+
+
+                string reg_code_prefix = "SWASH-EMP/TEN-";
+                DateTime datetime = System.DateTime.Now;
+                string year = datetime.ToString().Substring(5, 4);
+                var userRegistrationService = new UserRegistrationService();
+                var widgetuserRegistration = await userRegistrationService.GetMasterUserRegistrationsAsync();
+                int TbleMaxRegistrationId = (from c in widgetuserRegistration orderby c.User_RegistrationId select c.User_RegistrationId).LastOrDefault();
+                int maxRegistrationId = TbleMaxRegistrationId + 1;
+                string User_Unique_RegistrationCode = reg_code_prefix + maxRegistrationId + "/" + year;
+
+
+
+                ActiveDirectoryClient activeDirectoryClient;
+                activeDirectoryClient = AuthenticationHelper.GetActiveDirectoryClientAsApplication(this.HttpContext.Session);
+
+                IUser userToBeAdded = new User();
+                //string mail1 = "satyaawa@gmail.com";
+                Session["DomainNames"] = "kencloud.co";
+                userToBeAdded.DisplayName = FirstName;
+                //userToBeAdded.UserPrincipalName = userModel.mail.Replace("@", "_") + "@" + Session["DomainNames"].ToString();
+                userToBeAdded.UserPrincipalName = UserId.Replace("@", "_") + "@" + Session["DomainNames"].ToString();
+
+                userToBeAdded.AccountEnabled = true;
+
+                userToBeAdded.MailNickname = LastName;
+
+                userToBeAdded.PasswordProfile = new PasswordProfile
+
+                {
+
+                    Password = password,
+
+                    ForceChangePasswordNextLogin = true
+
+                };
+
+                userToBeAdded.UsageLocation = "US";
+
+                await activeDirectoryClient.Users.AddUserAsync(userToBeAdded);
+
+                if (userToBeAdded.DisplayName != "")
+                {
+                    if (userToBeAdded.ObjectId != null)
+                    {
+
+                        ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(delegate { return true; });
+
+                        #region Insert Master User Registration table
+                        Master_User_Registration tbReg = new Master_User_Registration();
+                        tbReg.User_First_Name = FirstName;
+                        tbReg.User_Last_Name = LastName;
+                        tbReg.User_DisplayName = Displayname;
+                        tbReg.User_EmailId = UserId;
+                        tbReg.User_MobileNo = Mobile;
+                        tbReg.User_OfficeLocation = Address1;
+
+                        tbReg.User_Unique_RegistrationCode = User_Unique_RegistrationCode;
+                        tbReg.User_ZipCode = Zipcode;
+                        tbReg.User_ObjectId = userToBeAdded.ObjectId;
+                        tbReg.User_Password = password;
+                        tbReg.IsFirstLogin = false;
+                        tbReg.InsertedBy = regId;
+                        tbReg.User_PrinicpalName = userToBeAdded.UserPrincipalName;
+                        tbReg.InsertedOn = System.DateTime.Now;
+                        tbReg.IsActive = true;
+                        tbReg.IsDelete = false;
+
+                        tbReg.Country_Id = Convert.ToInt32(Country);
+                        tbReg.State_Id = Convert.ToInt32(State);
+                        tbReg.User_CityName = City;
+
+                        HttpResponseMessage res = client.PostAsJsonAsync("UserRegistration", tbReg).Result; //saving data to the Master_User_Registration table
+
+                        #endregion
+
+                        //if (res.IsSuccessStatusCode)
+                        //{
+                        //    string RegistrationId = res.Content.ReadAsStringAsync().Result;
+
+                        //    #region MasterLogin User
+                        //    //-----Insert In Master Login User
+                        //    Master_Login_User master_Login_User_Object = new Master_Login_User();
+                        //    master_Login_User_Object.User_RegistrationId = Convert.ToInt32(RegistrationId);
+                        //    master_Login_User_Object.User_ObjectId = userToBeAdded.ObjectId;
+
+                        //    master_Login_User_Object.Is_Cleint_Super_Admin = false;
+                        //    master_Login_User_Object.Is_Cleint_User_Admin = true;
+                        //    master_Login_User_Object.IsPartner = false;
+                        //    master_Login_User_Object.Is_Configurator = false;
+                        //    master_Login_User_Object.Is_Approver = false;
+
+
+
+                        //    master_Login_User_Object.InsertedBy = Convert.ToInt32(RegistrationId);
+                        //    master_Login_User_Object.InsertedOn = System.DateTime.Now;
+                        //    master_Login_User_Object.IsActive = true;
+                        //    master_Login_User_Object.IsDelete = false;
+                        //    #endregion
+                        //    HttpResponseMessage res1 = client.PostAsJsonAsync("MasterLoginUser", master_Login_User_Object).Result;  //saving data to the MasterLoginUser table
+                        if (res.IsSuccessStatusCode)
+                        {
+                            string RegistrationId = res.Content.ReadAsStringAsync().Result;
+                            #region Device Type
+                            //==================================== Master_Device_Type=============================
+                            HttpBrowserCapabilities objBrwInfo = System.Web.HttpContext.Current.Request.Browser;
+                            string hostName = Dns.GetHostName(); // Retrive the Name of HOST
+
+                            Master_Device_Type DvTyp = new Master_Device_Type();
+                            DvTyp.Device_Name = Dns.GetHostName();
+                            DvTyp.Device_Model = "Desktop";
+                            DvTyp.InsertedOn = System.DateTime.Now;
+                            DvTyp.InsertedBy = regId;
+                            //DvTyp.LastModifiedOn = System.DateTime.Now;
+                            DvTyp.IsActive = true;
+                            DvTyp.IsDelete = false;
+                            DvTyp.Device_Name = null; //Request.UserHostName;
+                            DvTyp.Device_Manufacturer = null;
+                            DvTyp.Device_Type = objBrwInfo.Type;
+                            DvTyp.Device_OS_Type = getOperatinSystemDetails(Request.UserAgent);
+                            DvTyp.Device_OS_Version = getOperatinSystemDetails(Request.UserAgent);
+                            DvTyp.Device_MacAddress = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.GetValue(0).ToString();
+                            #endregion
+                            var response2 = client.PostAsJsonAsync("MasterDeviceType", DvTyp).Result;
+
+
+                            if (response2.IsSuccessStatusCode)
+                            {
+                                string Device_ID = response2.Content.ReadAsStringAsync().Result;
+
+                                //==================================== Master_Device_Registration=============================
+                                #region Master_Device_Registration
+                                Master_Device_Registration DevReg = new Master_Device_Registration();
+                                DevReg.User_RegistrationId = Convert.ToInt32(RegistrationId);
+                                if (GetDefaultGateway() != null)
+                                {
+                                    DevReg.Device_PublicIPGateway = GetDefaultGateway().ToString();
+                                }
+                                DevReg.Device_LocalIPAddress = Dns.GetHostByName(hostName).AddressList[0].ToString();
+                                DevReg.Device_ID = Convert.ToInt32(Device_ID);
+                                DevReg.Client_ID = 1;
+                                DevReg.InsertedOn = System.DateTime.Now;
+                                //DevReg.LastModifiedOn = System.DateTime.Now;
+                                DevReg.InsertedBy = regId;
+                                DevReg.IsActive = true;
+                                DevReg.IsDelete = false;
+                                var response3 = client.PostAsJsonAsync("MasterDeviceRegistration", DevReg).Result;
+                                #endregion
+
+                                if (response3.IsSuccessStatusCode)
+                                {
+                                    string Device_RegistrationId = response3.Content.ReadAsStringAsync().Result;
+
+
+                                    //==================================== Master_Login_History=============================
+                                    #region Master_Login_History
+                                    Master_Login_History LognHsty = new Master_Login_History();
+                                    LognHsty.User_RegistrationId = Convert.ToInt32(RegistrationId);
+                                    //LognHsty.Login_User_ID = Convert.ToInt32(password.Login_User_ID);
+                                    LognHsty.Device_RegistrationId = Convert.ToInt32(Device_RegistrationId);
+                                    LognHsty.Login_False_Hit_Attempt = true;
+                                    LognHsty.InsertedOn = DateTime.Now;
+                                    LognHsty.InsertedBy = regId;
+                                    // LognHsty.LastModifiedOn = DateTime.Now;
+                                    LognHsty.IsActive = true;
+                                    LognHsty.IsDelete = false;
+                                    Session["LoginDay"] = DateTime.Now.Date;
+
+                                    TimeSpan CurrentTime = DateTime.Now.TimeOfDay;
+                                    LognHsty.User_LoginTime = null; //TimeSpan(DateTime.Now.ToShortTimeString());//DateTime.Now.ToString("hh:mm:ss.fff tt", System.Globalization.DateTimeFormatInfo.InvariantInfo;
+                                    LognHsty.User_LogInDate = null;
+                                    var response4 = client.PostAsJsonAsync("MasterLoginHistory", LognHsty).Result;
+                                    #endregion Master_Login_History
+                                    if (response4.IsSuccessStatusCode)
+                                    {
+                                        //Insert In Master Upload
+                                        #region upload
+                                        Master_Upload upload = new Master_Upload();
+                                        upload.UplaodType_Id = 1;
+                                        if (Session["imageBlob"] == null)
+                                        {
+                                            upload.Uplaod_ImageURL = "https://kenresponse.blob.core.windows.net/marrion/d628defb-7d6b-4c25-962d-214c8261d1b7-.png";
+                                            upload.Uplaod_ThumbnailURL = "https://kenresponse.blob.core.windows.net/marrion/d628defb-7d6b-4c25-962d-214c8261d1b7-.png";
+                                        }
+                                        else
+                                        {
+                                            upload.Uplaod_ImageURL = Session["imageBlob"].ToString();
+                                            upload.Uplaod_ThumbnailURL = Session["imageBlob"].ToString();
+                                        }
+
+                                        upload.Uplaod_PostedDate = System.DateTime.Now;
+                                        upload.Uplaod_FileLink = "";
+                                        upload.Uplaod_FileType = "doc";
+                                        upload.Uplaod_ReferenceName = "document";
+                                        upload.Uplaod_ReferenceGivenName = "";
+                                        upload.Uplaod_FileSize = "";
+
+                                        upload.InsertedOn = System.DateTime.Now;
+                                        upload.InsertedBy = regId;
+                                        //upload.LastModifiedBy = 1;
+                                        //upload.LastModifiedOn = System.DateTime.Now;
+                                        upload.IsActive = true;
+                                        upload.IsDelete = false;
+                                        HttpResponseMessage res31 = client.PostAsJsonAsync("MasterUpload", upload).Result;
+                                        #endregion upload
+                                        if (res31.IsSuccessStatusCode)
+                                        {
+                                            int uploadId = Convert.ToInt32(res31.Content.ReadAsStringAsync().Result);
+                                            #region Upload LookUp
+                                            // Insert in Master Upload LookUp
+                                            Master_UploadLookup uploadLookup = new Master_UploadLookup();
+                                            uploadLookup.Uplaod_ID = uploadId;
+                                            uploadLookup.User_RegistrationId = Convert.ToInt32(RegistrationId);
+                                            uploadLookup.IsHiden = false;
+                                            uploadLookup.InsertedOn = System.DateTime.Now;
+                                            uploadLookup.InsertedBy = regId;
+                                            //uploadLookup.LastModifiedBy = Convert.ToInt32(RegistrationId);
+                                            //uploadLookup.LastModifiedOn = System.DateTime.Now;
+                                            uploadLookup.IsActive = true;
+                                            uploadLookup.IsDelete = false;
+                                            HttpResponseMessage res4 = client.PostAsJsonAsync("MasterUploadLookup", uploadLookup).Result;
+                                            #endregion
+                                            if (res4.IsSuccessStatusCode)
+                                            {
+                                                //========================Insert in Tanent User Role================
+                                                #region Insert Into Tanent User Role
+                                                Tanent_UserRole tbRole = new Tanent_UserRole();
+                                                if (assignRole == "User")
+                                                {
+                                                    tbRole.IsUserNoAdminstratorAccess = true;
+                                                    tbRole.IsGlobalAdminStrator = false;
+                                                    tbRole.IsCustomizedAdminStrator = false;
+                                                }
+
+                                                else if (assignRole == "Global")
+                                                {
+                                                    tbRole.IsUserNoAdminstratorAccess = false;
+                                                    tbRole.IsGlobalAdminStrator = true;
+                                                    tbRole.IsCustomizedAdminStrator = false;
+                                                }
+                                                else
+                                                {
+                                                    tbRole.IsUserNoAdminstratorAccess = false;
+                                                    tbRole.IsGlobalAdminStrator = false;
+                                                    tbRole.IsCustomizedAdminStrator = true;
+
+
+                                                    tbRole.Check_IsPasswordAdmin = false;
+                                                    tbRole.Check_IsBillingAdmin = false;
+                                                    tbRole.Check_UserManagementAdmin = false;
+                                                    tbRole.Check_ServiceAdmin = false;
+                                                    for (int i = 0; i < Rolearray.Length; i++)
+                                                    {
+                                                        string val = ((string[])Rolearray)[i];
+                                                        if (val == "PasswordAdmin")
+                                                        {
+                                                            tbRole.Check_IsPasswordAdmin = true;
+                                                        }
+                                                        if (val == "BillingAdmin")
+                                                        {
+                                                            tbRole.Check_IsBillingAdmin = true;
+                                                        }
+                                                        if (val == "UserManagementAdmin")
+                                                        {
+                                                            tbRole.Check_UserManagementAdmin = true;
+                                                        }
+                                                        if (val == "ServiceAdmin")
+                                                        {
+                                                            tbRole.Check_ServiceAdmin = true;
+                                                        }
+                                                    }
+                                                }
+                                                tbRole.InsertedOn = System.DateTime.Now;
+                                                tbRole.InsertedBy = 1;
+                                                tbRole.IsActive = true;
+                                                tbRole.IsDelete = false;
+                                                HttpResponseMessage resUserRole = client.PostAsJsonAsync("TanentUserRole", tbRole).Result;
+                                                #endregion
+                                                if (resUserRole.IsSuccessStatusCode)
+                                                {
+                                                    string tanentUserRoleId = resUserRole.Content.ReadAsStringAsync().Result;
+                                                    #region Insert Into Tanent UserList
+                                                    Tanent_UserList tbList = new Tanent_UserList();
+                                                    tbList.User_RegistrationId = Convert.ToInt32(RegistrationId);
+                                                    // tbList.TenentId = Convert.ToInt32(MasterTanentId);// 1;
+                                                    tbList.TenentId = tanentId;
+                                                    tbList.User_ObjectId = userToBeAdded.ObjectId;
+                                                    tbList.Designation_Id = Convert.ToInt32(Designation);
+                                                    tbList.Is_Cleint_Super_Admin = false;
+                                                    tbList.Is_Cleint_User_Admin = true;
+                                                    tbList.IsPartner = false;
+                                                    tbList.IsPartner = false;
+                                                    //tbList.Designation_Id = 1;
+                                                    tbList.ReportingAuthorityId = regId;//loginid
+                                                    tbList.Login_User_Status = "Active";
+                                                    tbList.Is_Blocked_signIn = false;
+                                                    tbList.Is_Licensed = false;
+                                                    tbList.Tanent_UserRoleId = Convert.ToInt32(tanentUserRoleId); // 1;
+                                                    tbList.InsertedOn = System.DateTime.Now;
+                                                    tbList.InsertedBy = regId;
+                                                    tbList.IsActive = true;
+                                                    tbList.IsDelete = false;
+                                                    HttpResponseMessage res2 = client.PostAsJsonAsync("TanentUserList", tbList).Result;
+                                                    if (res2.IsSuccessStatusCode)
+                                                    {
+
+                                                        Session["imageBlob"] = null;
+                                                        return Json(1);
+                                                    }
+                                                    #endregion
+                                                }
+
+
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                    }
+                }
+
+            }
+            return Json(0);
+        }
+        [HttpPost]
+        public async Task<ActionResult> Updateuser(string id, string FirstName, string Displayname, string UserId, string Address1, string Address2, string Authority, string Mobile, string State, string City, string Country, string Zipcode, string assignRole, Array Rolearray, Array Grouplist)
+        {
+            int tanentId, regId = 0;
+            if (Session["TanentId"] != null && Session["RegId"] != null)
+            {
+                tanentId = Convert.ToInt32(Session["TanentId"]);
+                regId = Convert.ToInt32(Session["RegId"]);
+
+                string lname = FirstName.Split(' ').Last();
+                string fName = FirstName.Replace(lname, "");
+                ClearCachedTeams();
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(delegate { return true; });
+
+                var TanentUser = new TanentUserListService();
+                var widgetReg = await TanentUser.GetTanentUserListAsync();
+                var data = widgetReg.ToList().Where(a => a.Tanent_UserListId == Convert.ToInt32(id)).FirstOrDefault();
+                var RegService = new UserRegistrationService();
+                var widgetReg1 = await RegService.GetMasterUserRegistrationsAsync();
+
+                Master_User_Registration tbReg = widgetReg1.Where(a => a.User_RegistrationId == Convert.ToInt32(data.User_RegistrationId)).FirstOrDefault();
+
+                tbReg.User_First_Name = fName;
+                tbReg.User_Last_Name = lname;
+                tbReg.User_DisplayName = Displayname;
+                tbReg.User_EmailId = UserId;
+                tbReg.User_MobileNo = Mobile;
+                tbReg.User_OfficeLocation = Address1;
+                tbReg.User_ZipCode = Zipcode;
+                tbReg.User_Password = tbReg.User_Password;
+                tbReg.InsertedBy = tbReg.InsertedBy;
+                tbReg.InsertedOn = tbReg.InsertedOn;
+                tbReg.IsActive = true;
+                tbReg.IsDelete = false;
+
+                tbReg.Country_Id = Convert.ToInt32(Country);
+                tbReg.State_Id = Convert.ToInt32(State);
+                tbReg.User_RegistrationId = Convert.ToInt32(data.User_RegistrationId);
+                tbReg.User_CityName = City;
+                HttpResponseMessage res = client.PutAsJsonAsync("UserRegistration/" + tbReg.User_RegistrationId, tbReg).Result; //saving data to the Master_User_Registration table
+                if (res.IsSuccessStatusCode)
+                {
+
+                }
+                Tanent_UserRole tbRole = new Tanent_UserRole();
+                if (assignRole == "User")
+                {
+                    tbRole.IsUserNoAdminstratorAccess = true;
+                    tbRole.IsGlobalAdminStrator = false;
+                    tbRole.IsCustomizedAdminStrator = false;
+                }
+
+                else if (assignRole == "Global")
+                {
+                    tbRole.IsUserNoAdminstratorAccess = false;
+                    tbRole.IsGlobalAdminStrator = true;
+                    tbRole.IsCustomizedAdminStrator = false;
+                }
+                else
+                {
+                    tbRole.IsUserNoAdminstratorAccess = false;
+                    tbRole.IsGlobalAdminStrator = false;
+                    tbRole.IsCustomizedAdminStrator = true;
+
+
+                    tbRole.Check_IsPasswordAdmin = false;
+                    tbRole.Check_IsBillingAdmin = false;
+                    tbRole.Check_UserManagementAdmin = false;
+                    tbRole.Check_ServiceAdmin = false;
+                    for (int i = 0; i < Rolearray.Length; i++)
+                    {
+                        string val = ((string[])Rolearray)[i];
+                        if (val == "PasswordAdmin")
+                        {
+                            tbRole.Check_IsPasswordAdmin = true;
+                        }
+                        if (val == "BillingAdmin")
+                        {
+                            tbRole.Check_IsBillingAdmin = true;
+                        }
+                        if (val == "UserManagementAdmin")
+                        {
+                            tbRole.Check_UserManagementAdmin = true;
+                        }
+                        if (val == "ServiceAdmin")
+                        {
+                            tbRole.Check_ServiceAdmin = true;
+                        }
+                    }
+                }
+                tbRole.InsertedOn = System.DateTime.Now;
+                tbRole.InsertedBy = 1;
+                tbRole.IsActive = true;
+                tbRole.IsDelete = false;
+                tbRole.Tanent_UserRoleId = Convert.ToInt32(data.Tanent_UserRoleId);
+                tbRole.LastModifiedBy = regId;
+                tbRole.LastModifiedOn = DateTime.Now;
+                HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserRole/" + data.Tanent_UserRoleId, tbRole).Result;
+                if (res1.IsSuccessStatusCode)
+                {
+
+                }
+                #region Tanent_UserList
+                Tanent_UserList tbList = new Tanent_UserList();
+                tbList.User_RegistrationId = Convert.ToInt32(data.User_RegistrationId);
+                tbList.TenentId = data.TenentId;
+                tbList.Designation_Id = data.Designation_Id;
+                tbList.ReportingAuthorityId = Convert.ToInt32(Authority);
+                tbList.Tanent_UserRoleId = data.Tanent_UserRoleId;
+                tbList.Login_User_Status = "Active";
+                tbList.Is_Blocked_signIn = false;
+                tbList.Is_Licensed = false;
+                tbList.LastModifiedBy = regId;
+                tbList.LastModifiedOn = DateTime.Now;
+                tbList.IsActive = true;
+                tbList.IsDelete = false;
+                HttpResponseMessage res2 = client.PutAsJsonAsync("TanentUserList/" + data.Tanent_UserListId, tbList).Result;
+                if (res2.IsSuccessStatusCode)
+                {
+
+                }
+                #endregion
+                #region upload
+                var Lookup = new MasterUploadLookupService();
+                var widgetLookup = await Lookup.GetMasterUploadLookupsAsync();
+                Master_UploadLookup Lookupdata = widgetLookup.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(data.User_RegistrationId)).FirstOrDefault();
+
+                var Upload = new MasterUploadService();
+                var widgetUpload = await Upload.GetMasterUploadsAsync();
+                Master_Upload Uploaddata = widgetUpload.ToList().Where(a => a.Uplaod_Id == Convert.ToInt32(Lookupdata.Uplaod_ID)).FirstOrDefault();
+                Uploaddata.Uplaod_Id = Uploaddata.Uplaod_Id;
+
+                Uploaddata.UplaodType_Id = Uploaddata.UplaodType_Id;
+                if (Session["imageBlob"] != null)
+                {
+                    Uploaddata.Uplaod_ImageURL = Session["imageBlob"].ToString();
+                    Uploaddata.Uplaod_ThumbnailURL = Session["imageBlob"].ToString();
+                }
+                else
+                {
+                    Uploaddata.Uplaod_ImageURL = "https://kenresponse.blob.core.windows.net/marrion/d628defb-7d6b-4c25-962d-214c8261d1b7-.png";
+                    Uploaddata.Uplaod_ThumbnailURL = "https://kenresponse.blob.core.windows.net/marrion/d628defb-7d6b-4c25-962d-214c8261d1b7-.png";
+                }
+
+                Uploaddata.Uplaod_PostedDate = DateTime.Now;
+
+                Uploaddata.Uplaod_FileLink = Uploaddata.Uplaod_FileLink;
+                Uploaddata.Uplaod_FileType = Uploaddata.Uplaod_FileType;
+                Uploaddata.Uplaod_ReferenceName = Uploaddata.Uplaod_ReferenceName;
+                Uploaddata.Uplaod_ReferenceGivenName = Uploaddata.Uplaod_ReferenceGivenName;
+                Uploaddata.Uplaod_FileSize = Uploaddata.Uplaod_FileSize;
+
+                //Uploaddata.InsertedOn = Uploaddata.InsertedOn;
+                //Uploaddata.InsertedBy = Uploaddata.InsertedBy;
+
+                Uploaddata.LastModifiedOn = DateTime.Now;
+                Uploaddata.LastModifiedBy = Convert.ToInt32(Session["RegId"]);
+                Uploaddata.IsActive = true;
+                Uploaddata.IsDelete = false;
+                HttpResponseMessage Uploaddatamsg = client.PutAsJsonAsync("MasterUpload/" + Uploaddata.Uplaod_Id, Uploaddata).Result;
+                #endregion
+                Master_GroupDetail tbgrp = new Master_GroupDetail();
+                var grpService = new MasterGroupService();
+                var widgrp = await grpService.GetMasterGroupAsync();
+                var grpdService = new MasterGroupDetailService();
+                var widgrpd = await grpdService.GetMasterGroupDetailAsync();
+                foreach (string a in Grouplist)
+                {
+                    if (a != "0")
+                    {
+                        string grpid = (from b in widgrp where b.Group_Name == a select b.Group_Id).FirstOrDefault().ToString();
+                        var grdata = (from b in widgrpd where b.Group_Id == Convert.ToInt32(grpid) && b.Group_UserId == Convert.ToInt32(id) select b).FirstOrDefault();
+                        if (grdata == null)
+                        {
+
+                            tbgrp.Group_Id = Convert.ToInt32(grpid);
+                            tbgrp.Group_UserId = Convert.ToInt32(id);
+                            HttpResponseMessage res22 = client.PostAsJsonAsync("MasterGroupDetail", tbgrp).Result;
+                        }
+
+                    }
+
+                }
+                ClearCachedTeams();
+                return Json(1);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+
+        #endregion
+
+
+        public async Task<ActionResult> GetFirstLastAccess([DataSourceRequest]DataSourceRequest req, string regId)
+        {
+            //var regList = new UserRegistrationService();
+            //var regdata = await regList.GetMasterUserRegistrationsAsync(1);
+            var userHistory = new MasterLoginHistoryService();
+            var historyData = await userHistory.GetMasterLoginHistorysAsync();
+            var accesdates = (from a in historyData
+                              where a.User_RegistrationId == Convert.ToInt32(regId)
+                              orderby a.Login_LogHistory_Id ascending
+                              select new
+                              {
+                                  a.User_LogInDate,
+                                  a.User_LogOutDate
+                              }).ToList();
+            var FirstDate = accesdates.FirstOrDefault();
+            var lastdate = accesdates.LastOrDefault();
+            ArrayList array = new ArrayList();
+            array.Add(FirstDate);
+            array.Add(lastdate);
+
+            //list
+            return Json(array, JsonRequestBehavior.AllowGet);
+        }
+
+        public class designation
+        {
+            public int DesignationId { get; set; }
+            public string DesignationName { get; set; }
+        }
+
+        public async Task<ActionResult> GetDesignation([DataSourceRequest]DataSourceRequest req)
+        {
+
+            var getuserlist = new GetUserListService();
+            var data = await getuserlist.GetUsersListByIdAsync(1);
+
+
+            var tenantuserlist = new TanentUserListService();
+            var data1 = await tenantuserlist.GetTanentUserListAsync();
+
+            var designation = (from a in data
+                               join c in data1 on a.User_RegistrationId equals c.User_RegistrationId
+                               select new
+                               {
+                                   a.Designation_Id,
+                                   a.User_JobTitle,
+
+                               }).ToList();
+            return Json(designation, JsonRequestBehavior.AllowGet);
+        }
+        public async Task<ActionResult> GetReportingAuthority([DataSourceRequest]DataSourceRequest req)
+        {
+
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+            var getuserlist = new UserRegistrationService();
+            var data = await getuserlist.GetMasterUserRegistrationsAsync();
+
+
+            var tenantuserlist = new TanentUserListService();
+            var data1 = await tenantuserlist.GetTanentUserListAsync();
+
+            var repportingDetails = (from a in data
+                                     join c in data1 on a.User_RegistrationId equals c.User_RegistrationId
+                                     where c.TenentId == Convert.ToInt32(Session["TanentId"])
+                                     select new
+                                     {
+                                         c.User_RegistrationId,
+                                         a.User_DisplayName,
+
+                                     }).ToList();
+
+            return Json(repportingDetails, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public async Task<ActionResult> GetDesignationForUserlist([DataSourceRequest]DataSourceRequest req)
+        {
+
+
+            var masterDesig = new MasterDesignationService();
+            var data1 = await masterDesig.GetMasterDesignationAsync();
+
+            var designation = (from a in data1
+                               select new
+                               {
+                                   a.Designation_Id,
+                                   a.Designation_Name,
+
+                               }).ToList();
+            return Json(designation, JsonRequestBehavior.AllowGet);
+
+        }
+
+        #region multiple UserResetPassword   
+        //completed
+        public async Task<ActionResult> MultipleResetPassword([DataSourceRequest]DataSourceRequest req, string maildata)
+        {
+            tanentId = Convert.ToInt32(Session["TanentId"]);
+            regId = Convert.ToInt32(Session["RegId"]);
+            string[] myArray = new string[4];
+            if (maildata != null)
+            {
+
+                var myarray = maildata.Split(',');
+
+                for (var i = 0; i < myarray.Length; i++)
+                {
+
+                    var item = myarray[i];
+
+                    var RegService = new UserRegistrationService();
+                    var widgetReg = await RegService.GetMasterUserRegistrationsAsync();
+                    var data = widgetReg.ToList().Where(a => a.User_EmailId == item).FirstOrDefault();
+                    var regId1 = data.User_RegistrationId;
+                    data.User_Password = RandonNo();
+                    HttpResponseMessage res1 = client.PutAsJsonAsync("UserRegistration/" + regId1, data).Result;
+                    if (res1.IsSuccessStatusCode)
+                    {
+                        MailSend(item, data.User_Password);
+                        myArray[i] = item;
+                        // string[] myArray = new string[4];
+                    }
+
+                }
+                return Json(myArray, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+        #endregion
+
+
+        #region Single UserResetPassword
+        public async Task<ActionResult> SingleResetPassword([DataSourceRequest]DataSourceRequest req, string maildata, string password)
+        {
+            var RegService = new UserRegistrationService();
+            var widgetReg = await RegService.GetMasterUserRegistrationsAsync();
+            var data = widgetReg.ToList().Where(a => a.User_EmailId == maildata).FirstOrDefault();
+            var regId = data.User_RegistrationId;
+            data.User_Password = password;
+            HttpResponseMessage res1 = client.PutAsJsonAsync("UserRegistration/" + regId, data).Result;
+            if (res1.IsSuccessStatusCode)
+            {
+
+                return Json(maildata, JsonRequestBehavior.AllowGet);
+
+            }
+            else
+            {
+                return Json(0);
+            }
+
+
+        }
+        #endregion
+
+        #region Local Method
+        public static string getOperatinSystemDetails(string browserDetails)
+        {
+            string deviceType = "";
+            try
+            {
+                switch (browserDetails.Substring(browserDetails.LastIndexOf("Windows NT") + 11, 3).Trim())
+                {
+                    case "6.2":
+                        return "Windows 8";
+                    case "6.1":
+                        return "Windows 7";
+                    case "6.0":
+                        return "Windows Vista";
+                    case "5.2":
+                        return "Windows XP 64-Bit Edition";
+                    case "5.1":
+                        return "Windows XP";
+                    case "5.0":
+                        return "Windows 2000";
+                    default:
+                        return browserDetails.Substring(browserDetails.LastIndexOf("Windows NT"), 14);
+                }
+
+
+                if (browserDetails.Contains("ipod") || browserDetails.Contains("iphone"))
+                    deviceType = "ipod";
+                return deviceType;
+
+                if (browserDetails.Contains("android"))
+                    deviceType = "android";
+                return deviceType;
+
+                if (browserDetails.Contains("opera mobi"))
+                    deviceType = "opera mobi";
+                return deviceType;
+
+                if (browserDetails.Contains("windows phone os") && browserDetails.Contains("iemobile"))
+                    deviceType = "windows phone os";
+                return deviceType;
+
+                if (browserDetails.Contains("fennec"))
+                    deviceType = "fennec";
+                return deviceType;
+
+            }
+            catch
+            {
+                if (browserDetails.Length > 149)
+                    return browserDetails.Substring(0, 149);
+                else
+                    return browserDetails;
+            }
+        }
+
+        public static IPAddress GetDefaultGateway()
+        {
+            var card = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault();
+            if (card == null) return null;
+            var address = card.GetIPProperties().GatewayAddresses.FirstOrDefault();
+            if (address != null)
+            {
+                return address.Address;
+
+            }
+            return null;
+        }
+        #endregion
+
+        #region ====Manjula=========
+        public async Task<ActionResult> BindDomainData([DataSourceRequest]DataSourceRequest request, string regId)
+        {
+            string domainName = null;
+            if (Session["domainnameLogin"] != null)
+            {
+                domainName = Convert.ToString(Session["domainnameLogin"]);
+            }
+            MasterTanentService lstMasterTanent = new MasterTanentService();
+            var widgetTanent = await lstMasterTanent.GetMasterTanentAsync();
+
+            TanentUserListService lstUserList = new TanentUserListService();
+            var widgetTanentuser = await lstUserList.GetTanentUserListAsync();
+            int tanentId = 0;
+            List<Master_Tanent> objDomain = new List<Master_Tanent>();
+            var tanentData = widgetTanentuser.Where(a => a.User_RegistrationId == Convert.ToInt32(regId)).ToList();
+            for (int i = 0; i < tanentData.Count(); i++)
+            {
+                tanentId = Convert.ToInt32(tanentData[i].TenentId);
+                var data = (from a in widgetTanent
+                            where a.TenentId == tanentId
+                            select new Master_Tanent
+                            {
+                                Tenent_CompanyName = a.Tenent_CompanyName,
+                                Tanent_Name = a.Tanent_Name,
+                                TenentId = a.TenentId
+
+                            }).FirstOrDefault();
+                objDomain.Add(data);
+            }
+            return Json(objDomain.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+        }
+
+        public async Task<ActionResult> BindProfileData(string regId)
+        {
+            try
+            {
+
+
+                GetProfilePhotoService lstprofilePhoto = new GetProfilePhotoService();
+                var widgetProfileData = await lstprofilePhoto.GetProfilePicAsync();
+                var profileData = (from a in widgetProfileData
+                                   where a.User_RegistrationId == Convert.ToInt32(regId)
+                                   select new
+                                   {
+                                       a.User_RegistrationId,
+                                       a.User_EmailId,
+                                       a.Uplaod_ImageURL,
+                                       FullName = a.User_First_Name + " " + a.User_Last_Name,
+                                       companyName = "Swash Convergence"
+                                   }).FirstOrDefault();
+
+                if (profileData != null)
+                {
+                    return Json(profileData, JsonRequestBehavior.AllowGet);
+                }
+                else
+                    return Json(0);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ActionResult> GetUrl(string tanentId)
+        {
+            TanentUserListService lstUserList = new TanentUserListService();
+            var widgetTanentuser = await lstUserList.GetTanentUserListAsync();
+
+            var licenseAssignTanentService = new AddLicenseToTanentService();
+            var widgetLicenseAssignToTanent = await licenseAssignTanentService.GetAddLicenseForTanentDetailAsync();
+
+            var masterUrlService = new MobGetURLByTanentService();
+            var tanenetDetailService = new TanentDetailsService();
+            var masterTanentService = new MasterTanentService();
+            var widgetTanentData = await masterTanentService.GetMasterTanentAsync();
+            var tanentName = widgetTanentData.Where(a => a.TenentId == Convert.ToInt32(tanentId)).FirstOrDefault().Tanent_Name;
+
+            bool isLicense = false;
+            var userListData = widgetTanentuser.Where(a => a.TenentId == Convert.ToInt32(tanentId)).FirstOrDefault();
+            if (userListData != null)
+            {
+                isLicense = Convert.ToBoolean(userListData.Is_Licensed);
+
+            }
+            string url = null;
+            if (isLicense == true)
+            {
+                var urlData = await masterUrlService.GetMobMasterProductURLByIdAsync(Convert.ToInt32(tanentId));
+                if (urlData != null)
+                {
+
+                    url = urlData.FirstOrDefault().Product_URLName;
+                    if (userListData != null)
+                    {
+                        var tanenetDetailsData = await tanenetDetailService.GetTanentDataByIdAsync(Convert.ToInt32(tanentId));
+                        if (tanenetDetailsData != null)
+                        {
+                            Session["ContainerName"] = null;
+                            Session["ContainerName"] = tanenetDetailsData.FirstOrDefault().ContainerName;
+                            var catelogDBService = new CatelogDBDetailService();
+                            var sbnae = await catelogDBService.GetCatelogDBDetailsAsync();
+                            var lstdataa = (from m in tanenetDetailsData
+                                            join n in sbnae on m.DBDetailsId equals n.DBDetailsId
+                                            select new
+                                            {
+                                                DatabaseName = n.DatabaseName,
+                                            }).FirstOrDefault();
+                            Session["DbName"] = null;
+                            Session["DbName"] = lstdataa.DatabaseName;
+
+                        }
+                        Session["RegId"] = null;
+                        Session["RegId"] = userListData.User_RegistrationId;
+                        Session["TanentId"] = null;
+                        Session["TanentId"] = userListData.TenentId;
+
+                    }
+                }
+                //return Json(url, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    status = "1",
+                    regId = userListData.User_RegistrationId,
+                    tanentid = userListData.TenentId,
+                    db = Session["DbName"],
+                    container = Session["ContainerName"],
+                    tanentname = tanentName,
+                    url = url
+
+                });
+            }
+
+            else
+            {
+                //return Json("1");
+                return Json(new
+                {
+                    status = "2"
+                });
+            }
+        }
+        #endregion
+
+
+        #region Log Out
+        public ActionResult Logout()
+        {
+            Session.Abandon();
+            return Json(1);
+        }
+
+        public ActionResult LogoutForResetPwd()
+        {
+            Session["TanentId"] = null;
+            Session["RegId"] = null;
+            return RedirectToAction("Index", "SingleSignOn", new { area = "CustomizedLogin" });
+        }
+        #endregion
+        #region Assign Subscription and license
+        public async Task<ActionResult> GetLicenseSubscription([DataSourceRequest] DataSourceRequest request)
+        {
+            int tid = 0;
+
+            tid = Convert.ToInt32(Session["TanentId"]);
+            var getSubLicenceLinkService = new SubLicenseLinkService();
+            var getLicence = new SubLicenseService();
+            var getLicenseToTanentService = new AddLicenseToTanentService();
+            var getSubscriptionToTanentService = new AddSubscriptionToTanentService();
+            var getProductService = new ProductService();
+            var getSubscriptionDetailsService = new SubSubscriptionPlanDetailService();
+            var getUserSubscriptionService = new MasterTanentUserLicenseSubscriptionService();
+            var getSubPlanSerialInv = new SubSubscriptionPlanSerialInventoryService();
+            var getSubLinkSerial = new SubSubscriptionLinkService();
+            var getSubILPre = new ILPrmiumService();
+            var getSubILStandard = new SubILStandardService();
+            var getSubILLower = new SubILLowerFunctionService();
+
+            var licenceLink = await getSubLicenceLinkService.GetSubLicenseLinkAsync();
+            var mainLicense = await getLicence.GetSubLicenseAsync();
+            var licenseToTanent = await getLicenseToTanentService.GetAddLicenseForTanentDetailAsync();
+            var subscriptionToTanent = await getSubscriptionToTanentService.GetAddSubscriptionForTanentDetailAsync();
+            var product = await getProductService.GetSubProductAsync();
+            var subscriptionDetails = await getSubscriptionDetailsService.GetSubscriptionPlanDetailAsync();
+            var subscriptionUser = await getUserSubscriptionService.GetMasterTanentUserListAsync();
+            var subscrPlanSerialInv = await getSubPlanSerialInv.GetSubSubscriptionPlanSerialInventoryAsync();
+            var subILPremium = await getSubILPre.GetSubILPremiumAsync();
+            var subILStandard = await getSubILStandard.GetSubILStandardAsync();
+            var subILLower = await getSubILLower.GetSubILLowerFunctionAsync();
+            var userlist = (from a in licenseToTanent
+                            where a.TenentId == tid
+                            //join b in product on a.ProductId equals b.ProductId
+                            join c in subscriptionToTanent on a.LicesneAssignToTanentId equals c.LicesneAssignToTanentId
+                            join d in subscrPlanSerialInv on c.SubscriptionPlan_Serial_Inventory_Id equals d.SubscriptionPlan_Serial_Inventory_Id
+                            join e in subscriptionDetails on d.SubscriptionPlanId equals e.SubscriptionPlanId
+                            join f in product on e.ProductId equals f.ProductId
+                            join g in licenceLink on a.LicenseLinkSerialId equals g.LicenseLinkSerialId
+                            join h in mainLicense on g.LicenseSerialId equals h.LicenseSerialId
+                            //join f in mainLicense on e.LicenseSerialId equals f.LicenseSerialId
+                            //where a.TenentId == tid
+                            orderby d.SubscriptionPlanId
+                            let TotalLicenseUsed = (from d in subscriptionUser
+                                                    where d.TenentId == tid && d.SubscriptionAssignId == c.SubscriptionAssignId && d.IsActive == true && d.IsDelete == false
+                                                    select d).Count()
+                            let TotalLicensedUsers = (from cr in subscriptionDetails
+                                                      where cr.SubscriptionPlanId == d.SubscriptionPlanId
+                                                      join x in subILPremium on cr.ILPremiumSerialId equals x.ILPremiumSerialId
+                                                      join y in subILStandard on cr.ILStandardSerialId equals y.ILStandardSerialId
+                                                      join z in subILLower on cr.ILLowerFunctionSerialId equals z.ILLowerFunctionSerialId
+                                                      select new
+                                                      {
+                                                          noOfSLInPremium = x.No_Of_SL,
+                                                          noOfLFInPremium = x.No_Of_LF,
+                                                          TotalNoOFSL = x.No_Of_SL + y.NoOfLicence,
+                                                          ToNoOfLF = x.No_Of_LF + z.NoOfLicence,
+                                                          TotalSLAndLF = x.No_Of_SL + y.NoOfLicence + x.No_Of_LF + z.NoOfLicence
+                                                      }).ToList()
+                            //join c in subscriptionDetails on b.ProductId equals c.ProductId
+                            select new
+                            {
+                                a.LicesneAssignToTanentId,
+                                // a.TenentId,
+                                a.ActiveDate,
+                                d.SubscriptionPlanId,
+                                // e.LicenseLinkSerialId,
+                                d.SubscriptionSerialId,
+                                d.SubscriptionLinkSerialId,
+                                d.SubscriptionPlan_Serial_Inventory_Id,
+                                c.SubscriptionAssignId,
+                                a.ProductId,
+                                f.ProductName,
+                                h.LicenseKeys,
+                                h.LicenseSerialId,
+                                e.SubscriptionPlanName,
+                                TotalLicenseUsed,
+                                TotalLicensedUsers
+
+                                //subDetails =(from d in subscription 
+                                //             where 
+                                //             d.LicesneAssignToTanentId == a.LicesneAssignToTanentId
+                                //            select d.SubscriptionAssignId)
+
+                            }).ToList();
+            //var SubscriptionDetailsList = (from k in userlist
+            //                               group k by k.SubscriptionPlanId into g
+            //                               select new {
+
+            //                                   //LicesneAssignToTanentId =g.Select(x=>x.LicesneAssignToTanentId).ToList(),
+            //                                   //ActiveDate = g.Select(x => x.ActiveDate).ToList(),
+            //                                   //SubscriptionPlanId = g.Select(x => x.SubscriptionPlanId).ToList(),
+            //                                   //LicenseLinkSerialId = g.Select(x=>x.LicenseLinkSerialId).ToList(),
+            //                                   //SubscriptionSerialId=g.Select(x=>x.SubscriptionSerialId).ToList(),
+            //                                   //SubscriptionLinkSerialId=g.Select(x=>x.SubscriptionLinkSerialId).ToList(),
+            //                                   //SubscriptionPlan_Serial_Inventory_Id=g.Select(x=>x.SubscriptionPlan_Serial_Inventory_Id).ToList(),
+            //                                   //SubscriptionAssignId=g.Select(x=>x.SubscriptionAssignId).ToList(),
+            //                                   ProductId=g.Select(x=>x.ProductId).ToList(),
+            //                                   ProductName=g.Select(x=>x.ProductName).ToList(),
+            //                                   LicenseKeys=g.Select(x=>x.LicenseKeys).ToList(),
+            //                                   LicenseSerialId=g.Select(x=>x.LicenseSerialId).ToList(),
+
+            //                                   TotalLicenseUsed=g.Sum(x=>x.TotalLicenseUsed),
+
+            //                                   TotalLicense = g.Sum(x => x.TotalLicensedUsers[0].Total),
+
+
+            //                               }).ToList();
+
+
+            return Json(userlist, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public async Task<ActionResult> CalRemainSubscription([DataSourceRequest] DataSourceRequest request, string SubscriptionTypeAndPlanId)
+        {
+            int tid = 0;
+            List<SubscriptionPlanDetailsViewModel> NOOfType = null;
+            var values = SubscriptionTypeAndPlanId.Split('_');
+            var SubscriptionType = values[0];
+            var SubscriptionPlan_Serial_Inventory_Id = values[1];
+
+            tid = Convert.ToInt32(Session["TanentId"]);
+            var getSubPlanSerialInveService = new SubSubscriptionPlanSerialInventoryService();
+            var getSubPlanDetailService = new SubscriptionPlanDetailsByIdService();
+            var subPlanSerialInventrory = await getSubPlanSerialInveService.GetSubSubscriptionPlanSerialInventoryAsync();
+            var getSubPlanDetail = (from s in subPlanSerialInventrory
+                                    where s.SubscriptionPlan_Serial_Inventory_Id == Convert.ToInt32(SubscriptionPlan_Serial_Inventory_Id)
+                                    select new
+                                    {
+                                        s.SubscriptionLinkSerialId,
+                                        s.SubscriptionPlanId,
+                                        s.SubscriptionPlan_Serial_Inventory_Id,
+                                        s.SubscriptionSerialId
+                                    }).ToList();
+            // var  = await getSubPlanDetailService.GetSubscriptionPlanDetailsById();
+            int totalNoOfType = 0;
+            var subPlanDetail = await getSubPlanDetailService.GetSubscriptionPlanDetailsById(getSubPlanDetail[0].SubscriptionPlanId.ToString());
+
+            if (SubscriptionType == "ILStandard")
+            {
+                var NOOfType1 = (from a in subPlanDetail
+                                 select new { a.TotalNoOFSL }).ToList();
+                totalNoOfType = Convert.ToInt32(NOOfType1[0].TotalNoOFSL);
+                // from a in subPlanDetails select a.TotalNoOFSL;
+            }
+            else if (SubscriptionType == "ILLowerFunction")
+            {
+                var NOOfType1 = (from a in subPlanDetail
+                                 select new { a.ToNoOfLF }).ToList();
+                totalNoOfType = Convert.ToInt32(NOOfType1[0].ToNoOfLF);
+            }
+
+
+            //join b in product on a.ProductId equals b.ProductId
+            //join c in subscriptionToTanent on a.LicesneAssignToTanentId equals c.LicesneAssignToTanentId
+            //join e in licenceLink on a.LicenseLinkSerialId equals e.LicenseLinkSerialId
+            //join f in mainLicense on e.LicenseSerialId equals f.LicenseSerialId
+            //where a.TenentId == tid
+            ////join c in subscriptionDetails on b.ProductId equals c.ProductId
+            //select new
+            //{
+            //    //a.LicesneAssignToTanentId,
+            //    // a.TenentId,
+            //    c.SubscriptionAssignId,
+            //    c.SubscriptionPlanId,
+            //    a.ProductId,
+            //    b.ProductName,
+            //    f.LicenseKeys,
+            //    f.LicenseSerialId,
+            //    //c.SubscriptionPlanName,
+
+            //    TotalLicensedUsers = from cr in subscriptionDetails
+            //                         where cr.ProductId == b.ProductId
+            //                         group cr by cr.ProductId into g
+            //                         select new { Total = g.Sum(x => x.TotalLicensedUsers) },
+            //    TotalLicenseUsed = (from d in subscriptionUser
+            //                        where d.TenentId == tid
+            //                        select d).Count()
+            //    //subDetails =(from d in subscription 
+            //    //             where 
+            //    //             d.LicesneAssignToTanentId == a.LicesneAssignToTanentId
+            //    //            select d.SubscriptionAssignId)
+
+            //}).ToList();
+
+
+            return Json(totalNoOfType, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public async Task<ActionResult> SaveLicenseAndSubscription([DataSourceRequest] DataSourceRequest request, string subscriptionAssignId, string subscriptionType, string LicenseSerialId, string licenseKeys, string regId, string subscriptionPlanId, string activationDate)
+        {
+            int? ValidityDetailId = 0;
+            int? validityOfSubType = 0;
+            int subId = Convert.ToInt32(subscriptionPlanId);
+            var subscriptionDetails = new SubSubscriptionPlanDetailService();
+            var getSubPlanDetail = await subscriptionDetails.GetSubscriptionPlanDetailAsync();
+            var allSubscriptionDetail = getSubPlanDetail.Where(a => a.SubscriptionPlanId == subId).FirstOrDefault();
+            var tid = Convert.ToInt32(Session["TanentId"]);
+            if (subscriptionType == "ILStandard")
+            {
+                if (allSubscriptionDetail.IsILStandard == true)
+                {
+                    var IlSerialId = allSubscriptionDetail.ILStandardSerialId;
+                    var subIlStandard = new SubILStandardService();
+                    var getSubIlStandard = await subIlStandard.GetSubILStandardAsync();
+                    ValidityDetailId = getSubIlStandard.Where(a => a.ILStandardSerialId == IlSerialId).FirstOrDefault().ValidityDetailId;
+                }
+            }
+            else if (subscriptionType == "ILLowerFunction")
+            {
+                if (allSubscriptionDetail.IsILLowerFunction == true)
+                {
+                    var IlSerialId = allSubscriptionDetail.ILLowerFunctionSerialId;
+                    var subIlLower = new SubILLowerFunctionService();
+                    var getSubIlLower = await subIlLower.GetSubILLowerFunctionAsync();
+                    ValidityDetailId = getSubIlLower.Where(a => a.ILLowerFunctionSerialId == IlSerialId).FirstOrDefault().ValidityDetailId;
+                }
+            }
+
+            if (ValidityDetailId != 0)
+            {
+                var validityDetail = new ValidityService();
+                var getValidityDetail = await validityDetail.GetSubValidityDetailAsync();
+                validityOfSubType = getValidityDetail.Where(a => a.ValidityDetailId == ValidityDetailId).FirstOrDefault().ValidityInDays;
+            }
+            DateTime activDate = Convert.ToDateTime(activationDate);
+            DateTime Enddate = activDate.AddDays(Convert.ToInt32(validityOfSubType));
+            Master_TanentUserLicenseSubscription TanentUserLicSubObj = new Master_TanentUserLicenseSubscription();
+            TanentUserLicSubObj.TenentId = Convert.ToInt32(tid);
+            //LognHsty.Login_User_ID = Convert.ToInt32(password.Login_User_ID);
+            TanentUserLicSubObj.User_RegistrationId = Convert.ToInt32(regId);
+            TanentUserLicSubObj.SubscriptionAssignId = Convert.ToInt32(subscriptionAssignId);
+            TanentUserLicSubObj.SubscriptionType = subscriptionType;
+            TanentUserLicSubObj.LIcenseSerialId = Convert.ToInt32(LicenseSerialId);
+            TanentUserLicSubObj.LicenseKeys = licenseKeys;
+            TanentUserLicSubObj.StartDate = activDate;
+            TanentUserLicSubObj.EndDate = Enddate;
+            TanentUserLicSubObj.InsertedOn = DateTime.Now;
+            TanentUserLicSubObj.InsertedBy = Convert.ToInt32(Session["RegId"]);
+            TanentUserLicSubObj.IsActive = true;
+            TanentUserLicSubObj.IsDelete = false;
+            var response4 = client.PostAsJsonAsync("MasterTanentUserLicenseSubscription", TanentUserLicSubObj).Result;
+            if (response4.IsSuccessStatusCode)
+            {
+                tanentId = Convert.ToInt32(Session["TanentId"]);
+                var userList = new TanentUserListService();
+                var widgetuserlist = await userList.GetTanentUserListAsync();
+                var data = widgetuserlist.ToList().Where(a => a.User_RegistrationId == Convert.ToInt32(regId) && a.TenentId == tanentId).FirstOrDefault();
+                var userlistId = data.Tanent_UserListId;
+                data.Is_Licensed = true;
+                HttpResponseMessage res1 = client.PutAsJsonAsync("TanentUserList/" + userlistId, data).Result;
+                if (res1.IsSuccessStatusCode)
+                {
+                    return Json(1);
+                }
+                else
+                {
+                    return Json(0);
+                }
+
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+
+        public async Task<ActionResult> UpdateLicenseAndSubscription([DataSourceRequest] DataSourceRequest request, string subscriptionType, string TanentUserLicenseSubId, string subscriptionPlanId, string activeDate)
+        {
+            int? ValidityDetailId = 0;
+            int? validityOfSubType = 0;
+            int subId = Convert.ToInt32(subscriptionPlanId);
+            var subscriptionDetails = new SubSubscriptionPlanDetailService();
+            var getSubPlanDetail = await subscriptionDetails.GetSubscriptionPlanDetailAsync();
+            var allSubscriptionDetail = getSubPlanDetail.Where(a => a.SubscriptionPlanId == subId).FirstOrDefault();
+            var tid = Convert.ToInt32(Session["TanentId"]);
+            if (subscriptionType == "ILStandard")
+            {
+                if (allSubscriptionDetail.IsILStandard == true)
+                {
+                    var IlSerialId = allSubscriptionDetail.ILStandardSerialId;
+                    var subIlStandard = new SubILStandardService();
+                    var getSubIlStandard = await subIlStandard.GetSubILStandardAsync();
+                    ValidityDetailId = getSubIlStandard.Where(a => a.ILStandardSerialId == IlSerialId).FirstOrDefault().ValidityDetailId;
+                }
+            }
+            else if (subscriptionType == "ILLowerFunction")
+            {
+                if (allSubscriptionDetail.IsILLowerFunction == true)
+                {
+                    var IlSerialId = allSubscriptionDetail.ILLowerFunctionSerialId;
+                    var subIlLower = new SubILLowerFunctionService();
+                    var getSubIlLower = await subIlLower.GetSubILLowerFunctionAsync();
+                    ValidityDetailId = getSubIlLower.Where(a => a.ILLowerFunctionSerialId == IlSerialId).FirstOrDefault().ValidityDetailId;
+                }
+            }
+            if (ValidityDetailId != 0)
+            {
+                var validityDetail = new ValidityService();
+                var getValidityDetail = await validityDetail.GetSubValidityDetailAsync();
+                validityOfSubType = getValidityDetail.Where(a => a.ValidityDetailId == ValidityDetailId).FirstOrDefault().ValidityInDays;
+            }
+            DateTime activDate = Convert.ToDateTime(activeDate);
+            DateTime Enddate = activDate.AddDays(Convert.ToInt32(validityOfSubType));
+            var TanentUserLicSubObj = new MasterTanentUserLicenseSubscriptionService();
+            var widgetTanentUserLicSub = await TanentUserLicSubObj.GetMasterTanentUserListAsync();
+            var data = widgetTanentUserLicSub.ToList().Where(a => a.TanentLicenseSubscriptionId == Convert.ToInt32(TanentUserLicenseSubId)).FirstOrDefault();
+            data.SubscriptionType = subscriptionType;
+            data.StartDate = activDate;
+            data.EndDate = Enddate;
+            HttpResponseMessage res1 = client.PutAsJsonAsync("MasterTanentUserLicenseSubscription/" + Convert.ToInt32(TanentUserLicenseSubId), data).Result;
+            if (res1.IsSuccessStatusCode)
+            {
+                return Json(data, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(0);
+            }
+        }
+
+
+        public async Task<ActionResult> GetTanentUserLicencedListById([DataSourceRequest]DataSourceRequest req, string rid)
+        {
+
+            var tid = Convert.ToInt32(Session["TanentId"]);
+            var getUserSubscriptionService = new MasterTanentUserLicenseSubscriptionService();
+            var getMasterSubAssignToTanent = new AddSubscriptionToTanentService();
+            var getSubPlanSerialInv = new SubSubscriptionPlanSerialInventoryService();
+            var getSubPlanDetails = new SubSubscriptionPlanDetailService();
+            var getSubProduct = new ProductService();
+            var MasterTanentUserList = await getUserSubscriptionService.GetMasterTanentUserListAsync();
+            var MasterAssignToTanent = await getMasterSubAssignToTanent.GetAddSubscriptionForTanentDetailAsync();
+            var MasterSubPlanSerialInv = await getSubPlanSerialInv.GetSubSubscriptionPlanSerialInventoryAsync();
+            var SubPlanDetails = await getSubPlanDetails.GetSubscriptionPlanDetailAsync();
+            var Product = await getSubProduct.GetSubProductAsync();
+            var alldata = (from a in MasterTanentUserList where a.IsActive==true && a.IsDelete==false
+                           where a.User_RegistrationId == Convert.ToInt32(rid) && a.TenentId == Convert.ToInt32(tid)
+                           join b in MasterAssignToTanent on a.SubscriptionAssignId equals b.SubscriptionAssignId
+                           join c in MasterSubPlanSerialInv on b.SubscriptionPlan_Serial_Inventory_Id equals c.SubscriptionPlan_Serial_Inventory_Id
+                           join d in SubPlanDetails on c.SubscriptionPlanId equals d.SubscriptionPlanId
+                           join e in Product on d.ProductId equals e.ProductId
+                           select new
+                           {
+                               a.SubscriptionType,
+                               a.LIcenseSerialId,
+                               a.TanentLicenseSubscriptionId,
+                               c.SubscriptionPlan_Serial_Inventory_Id,
+                               d.SubscriptionPlanName,
+                               d.SubscriptionPlanId,
+                               e.ProductName
+                           });
+            //var allSubToUsers = MasterTanentUserList.Where(a => a.User_RegistrationId == Convert.ToInt32(rid)).ToList();
+
+            return Json(alldata, JsonRequestBehavior.AllowGet);
+
+        }
+        #endregion
+
+    }
+}
