@@ -1,0 +1,3832 @@
+@using Kendo.Mvc.UI
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html >
+<head>
+    <meta charset="utf-8" />
+
+    <title>Client Admin</title>
+    <link rel='shortcut icon' type='image/x-icon' href='~/Images/fav.ico' />
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/kendo/2017.2.621/kendo.web.min.js"></script>
+    <script src="~/Scripts/kendo/2017.2.621/kendo.aspnetmvc.min.js"></script>
+    <script src="~/Scripts/kendo/2017.2.621/kendo.all.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <link href="~/Content/kendo/2017.2.621/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/2017.2.621/kendo.rtl.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/2017.2.621/kendo.metro.min.css" rel="stylesheet" />
+
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    @*<link href="~/Content/kendo/2017.2.621/kendo.common-bootstrap.min.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/Content/kendo/2017.2.621/kendo.nova.mobile.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/2017.2.621/kendo.mobile.all.min.css" rel="stylesheet" type="text/css" />
+
+    @*<link href="~/Content/kendo/2017.2.621/kendo.bootstrap.min.css" rel="stylesheet" type="text/css" />*@
+    @*<script src="~/Scripts/kendo/2017.2.621/jquery.min.js"></script>*@
+    @*   <script src="~/Scripts/kendo/2017.2.621/angular.min.js"></script>
+        <script src="~/Scripts/kendo/2017.2.621/jszip.min.js"></script>
+        <script src="~/Scripts/kendo/2017.2.621/kendo.all.min.js"></script>*@
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/basic.css" rel="stylesheet" />
+    <style>
+        .k-panelbar > .k-last {
+        }
+
+        .admincenter {
+            background-color: white;
+            height: 35px;
+        }
+
+        .k-panelbar .k-link > .k-image, .k-panelbar .k-link > .k-sprite {
+              float: left;
+    margin-top: 6px;
+    margin-right: 3px;
+    vertical-align: middle;
+    width: 24px;
+    height: 20px;
+    font-size: 14px;padding-top: 1px;
+        }
+        .k-panelbar .k-link > .k-sprite.fa-home{font-size:17px;margin-top: 3px;}
+
+        .k-reset {
+            border: none;
+            /*top: 50px !important;*/
+        }
+
+        .k-panel > .k-item > .k-link, .k-panelbar > .k-item > .k-link {
+            border-bottom-style: none;
+            border-bottom-width: 0px;
+        }
+
+        /*.k-panel > .k-item > .k-link, .k-panelbar > .k-item > .k-link {
+            padding: 4px 1px;
+            line-height: 1.6em;
+            font-size: 12px;
+        }*/
+
+        /*.k-panel > li.k-item {
+                      padding-left: 13px;
+                  }*/
+        /*.k-panelbar>li.k-state-default>.k-link
+             {
+                 color :#fff;
+                 background:#428bca;
+             }*/
+
+        /*.k-panelbar .k-content, .k-panelbar .k-item, .k-panelbar .k-panel
+           {
+               background-color:#fff;
+           }*/
+        .k-panel > li.k-item {
+            background-color: #eaeaea;
+        }
+
+        .k-panelbar .k-content, .k-panelbar .k-item, .k-panelbar .k-panel {
+            background-color: #eaeaea;
+        }
+
+        #panelbar .k-header {
+            background: #f2f1f1;
+            color: #787878; padding-left: 2px;
+            font-size:12px;
+        }
+
+            #panelbar .k-header:hover {
+                background: #f8f8f8;
+                color: #787878;
+            }
+        #panelbar .k-panel > li.k-item .k-link:hover {
+            background: #f2f1f1;
+            color: #079af5;
+        }
+
+        #panelbar .k-item .k-state-selected {
+            background: #f2f1f1;
+            /*color: #079af5;*/
+            box-shadow: none;
+               
+        }
+       
+    </style>
+
+    <style>
+        .body-container {
+            width: 87%;
+            /*background: #efefef; */
+            min-height: 100%;
+            position: fixed;
+            margin-top: 50px;
+            margin-left: 203px;
+            z-index: -1;
+            /*    border: 1px solid lightgrey;*/
+        }
+          .k-panelbar .k-item,#panelbar .k-panel > li.k-item > .k-link {
+            background: #f2f1f1;
+            font-size: 11px;
+            line-height: 1.7em;
+            list-style-type:none;
+             
+        }
+          #panelbar .k-panel > li.k-item > .k-link.k-state-selected{color:#079af5;}
+        .k-panel > li.k-item{
+            background:#f2f1f1;
+        }
+        .k-panelbar .k-panel{
+            background:#f2f1f1;
+        }
+        #panelbar .k-state-active .k-group{background:#f2f2f2;}
+        #panelbar .k-state-active .k-group .k-link{padding: 1px 0px 0px 37px;}
+ 
+    </style>
+   
+</head>
+<body id="body1">
+   
+    <div data-role="navbar" class="topbar k-content">
+        <div style="background: #fff;padding: 1px 4px 2px 15px;float: left; ">
+            <img src="~/images/logo.png" />
+        </div>
+        <div class="midpan">
+
+            @*<ul>
+                    <li><a href="#" style="border-left:#ccc 1px solid"><img src="~/images/star.png" /></a></li>
+                    <li style="padding:8px !important;margin-top:-20px;border-right:none !important"><p style="padding-bottom:0;cursor:pointer" value='Show Layer' id='bt1' onClick="setVisibility('logosub')"><img src="~/images/kencloud.png" width="45" /></p></li>
+                    <div id="logosub">
+                        <div class="arrow-up"></div>
+                        <ul>
+                            <h3>Module Master</h3>
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/products-icon.jpg" /></div>
+                                    <h5>Products</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/catalogue-icon.jpg" /></div>
+                                    <h5>Catalogue</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/orderfulfillment-icon.jpg" /></div>
+                                    <h5>Order Fulfillment</h5>
+                                    <p>Partner’s details of SWASH</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/fecommerce-icon.jpg" /></div>
+                                    <h5>Facebook E-com</h5>
+                                    <p>Partner’s details of SWASH</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/scheme-icon.jpg" /></div>
+                                    <h5>Scheme</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/customer-icon.jpg" /></div>
+                                    <h5>Customer</h5>
+                                    <p>Partner’s details of SWASH</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/payment-icon.jpg" /></div>
+                                    <h5>Payment</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/supporticket-icon.jpg" /></div>
+                                    <h5>Support Ticket</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/seller-icon.jpg" /></div>
+                                    <h5>Seller</h5>
+                                    <p>Partner’s details of SWASH</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/vendor-icon.jpg" /></div>
+                                    <h5>Vendor</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/brand-icon.jpg" /></div>
+                                    <h5>Brand</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    <div align="center"><img src="~/images/onlinestore-icon.jpg" /></div>
+                                    <h5>Online Store</h5>
+                                    <p>The direct customers of SW</p>
+                                </a>
+                            </li>
+
+                        </ul>
+
+                        <div class="clear-fix"></div>
+                        <br>
+                        <div style="border-top:#e6e5e5 1px solid;padding:10px"></div>
+
+
+                        <ul>
+                            <h3>Analytics & Setting</h3>
+
+                            <li class="childe">
+                                <a href="#">
+                                    <div align="center"><img src="~/images/report-icon.jpg" /></div>
+                                    <h5>Report</h5>
+                                </a>
+                            </li>
+
+                            <li class="childe">
+                                <a href="#">
+                                    <div align="center"><img src="~/images/dashboard-icon.jpg" /></div>
+                                    <h5>Dashboard</h5>
+                                </a>
+                            </li>
+
+                            <li class="childe">
+                                <a href="#">
+                                    <div align="center"><img src="~/images/configuration-icon.jpg" /></div>
+                                    <h5>Configuration</h5>
+                                </a>
+                            </li>
+
+                            <li class="childe">
+                                <a href="#">
+                                    <div align="center"><img src="~/images/setting-icon.jpg" /></div>
+                                    <h5>Settings</h5>
+                                </a>
+                            </li>
+
+                        </ul>
+
+                        <div class="clear-fix"></div>
+                        <br>
+                        <div style="border-top:#e6e5e5 1px solid;padding:10px"></div>
+
+                    </div>
+                    <li><a href="#" style="border-left:#cccccc 1px solid !important"><img src="~/images/desktop.png" /></a></li>
+                </ul>*@
+        </div>
+
+
+
+        <div align="right" class="row rightnavi" @*style="width:480px !important;"*@>
+            <div class="">
+                <ul>
+                    @*<li><a href="#" style="border-left:#ccc 1px solid" id="slide-bolt"><img src="~/images/add.png" /></a></li>*@
+
+                    <li class="k-content"><a href="#" style="border-left:#ccc 1px solid" id="slide-alarm"><img src="~/images/alarm.png" /></a></li>
+                    <li><a href="#" style="border-left:#ccc 1px solid" id="slide-question"><img src="~/images/questionmark.png" /></a></li>
+                    <li style="width: 60%;">
+                        <a href="#" style="border-left:#ccc 1px solid;padding: 9px 0px 9px 0px;text-align: left;padding-left: 5px;" id="profile-slide">
+                            <span style="position:relative;top:0px" class="dropdown">
+                                <div class="dropbtn" style="display: inline;">
+                                    <img id="ProfileImage" style="position:relative;top:0px;left: 1px;width: 24px;height: 24px;border-radius: 30px;" src="" />
+                                    <span id="ProfileUserName" style="font-size:12px;"></span>
+
+                                </div>
+                                @*<div id="myDropdown" class="dropdown-content">
+                                        <a href="#" style="border:#0070c0 1px dotted">Setup <span style="float:right;padding:2px"><img src="~/images/setup.png" /></span></a>
+                                        <a href="#">Payment <span style="float:right;padding:2px"><img src="~/images/payment.png" /></span></a>
+                                        <a href="#">Inventory <span style="float:right;padding:2px"><img src="~/images/inventory.png" /></span></a>
+                                        <a href="#">Purchase <span style="float:right;padding:2px"><img src="~/images/purchase.png" /></span></a>
+                                        <a href="#">Accounting <span style="float:right;padding:2px"><img src="~/images/accounting.png" /></span></a>
+                                    </div>*@
+                            </span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <div class="row float-left bdleft-pan k-content" id="side_nav">
+       
+        @*style="border-right:#e1e1e1 2px solid !important;"*@
+        @*style="background-color:#428bca;border-right:#428bca 1px solid !important;"*@
+      
+
+
+        <div class="k-content" id="sid_nav_inner" style="border-right: #e1e1e1 1px solid !important;color:#0070c0;border-bottom:none;">
+            @(Html.Kendo().PanelBar()
+        .Name("panelbar")
+        .ExpandMode(PanelBarExpandMode.Single)
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Organisation Home")
+                //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Home.png"))
+                .SpriteCssClasses("fa fa-home")
+                .Items(baseball =>
+                {
+                    baseball.Add().Text("DashBoard").Url("/ClientAdmin/ClientDashBoard/Index").SpriteCssClasses("");
+
+
+                    baseball.Add().Text("Organization profile").Url("/Organization/OrganizationAddDetails/index").SpriteCssClasses("");
+
+
+                    baseball.Add().Text("OU Environment").Url("/ClientAdmin/Environmentsetup/index").SpriteCssClasses("");
+                    baseball.Add().Text("Language and Time").Url("/Organization/OrganizationTimeZone/index").SpriteCssClasses("");
+                });
+
+            panelbar.Add().Text("Users")
+                //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/groups15X15.png"))
+                .SpriteCssClasses("fa fa-user-o")
+                .Items(golf =>
+                {
+                    golf.Add().Text("Active Users").Url("/ClientAdmin/Userlist/index").SpriteCssClasses("");
+
+
+                    golf.Add().Text("Organization Contact").SpriteCssClasses("");
+
+
+
+                });
+            panelbar.Add().Text("Groups")
+               //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/User.png"))
+               .SpriteCssClasses("fa fa-users")
+               .Url("/ClientAdmin/GroupList/index")
+               .Items(golf1 =>
+               {
+
+
+               });
+
+            panelbar.Add().Text("Subscription & License")
+                //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/asign15X15.png"))
+                .SpriteCssClasses("fa fa-id-card-o")
+                .Items(swimming =>
+                {
+                    swimming.Add().Text("Dashboard").Url("/SubscriptionLicense/SubscriptionDashboard/Index").SpriteCssClasses("");
+
+                    swimming.Add().Text("License").Url("/SubscriptionLicense/LicenseList/index").SpriteCssClasses("");
+
+                    swimming.Add().Text("Subscription").Url("/SubscriptionLicense/ActiveSubscription/indexlist").SpriteCssClasses("");
+
+                    swimming.Add().Text("Billing").Url("/SubscriptionLicense/BillingList/index").SpriteCssClasses("");
+
+                    swimming.Add().Text("Billing Notification").Url("/SubscriptionLicense/BillingNotification/index").SpriteCssClasses("");
+                    swimming.Add().Text("External Users").Url("/SubscriptionLicense/ExternalUser/index").SpriteCssClasses("");
+                });
+            panelbar.Add().Text("Payments")
+            //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Reports.png"))
+
+            .SpriteCssClasses("fa fa-credit-card")
+              .Items(swimming =>
+              {
+
+              });
+            panelbar.Add().Text("Settings")
+              //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/User.png"))
+              .SpriteCssClasses("fa fa-cogs")
+              .Items(swimming1 =>
+              {
+                  swimming1.Add().Text("Security & Privacy").Url("/Settings/SecurityPrivacy/Index").SpriteCssClasses("");
+
+
+                  swimming1.Add().Text("Partnership Relationship").SpriteCssClasses("");
+
+                  swimming1.Add().Text("Domains").Url("/Settings/DomainList/index").SpriteCssClasses("");
+
+
+              });
+            panelbar.Add().Text("Request Approval")
+               //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Bell support.png"))
+               .SpriteCssClasses("fa fa-check-square-o")
+               .Url("/ClientAdmin/RequestForApproval/index")
+              .Items(swimming =>
+              {
+
+              });
+            panelbar.Add().Text("Support")
+              //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Support.png"))
+            .SpriteCssClasses("fa fa-wrench")
+              .Items(swimming11 =>
+              {
+                  swimming11.Add().Text("Dashboard").Url("/ClientSupport/SupportDashBoard/index").SpriteCssClasses("");
+                  //  swimming11.Add().Text("Service List").Url("/ClientSupport/ListPage/index").SpriteCssClasses("k-icon k-i-user padlt");
+
+                  swimming11.Add().Text("Service Requests").Url("/ClientSupport/ListPage/index").SpriteCssClasses("");
+
+                  swimming11.Add().Text("Notifications").Url("/ClientSupport/NotificationSendUserList/index").SpriteCssClasses("");
+
+
+                  //swimming11.Add().Text("Feedback").SpriteCssClasses("k-icon k-i-tell-a-friend padlt");
+
+
+
+              });
+            panelbar.Add().Text("Reports")
+              //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Support.png"))
+              .SpriteCssClasses("fa fa-line-chart")
+              .Items(swimming =>
+              {
+
+              });
+            panelbar.Add().Text("Communication")
+             //.ImageUrl(Url.Content("https://swasherpstorageaccount.blob.core.windows.net/kencentralmainlangingicon/Support.png"))
+             .SpriteCssClasses("fa fa-volume-control-phone")
+             .Items(swimming =>
+             {
+
+             });
+
+        })
+            )
+            <div class="admincenter" style="padding-top: 6px;background: #f2f2f2;border-bottom: #e1e1e1 1px solid !important;height:auto;border-top:none;">
+
+                <span style="margin-left: 5px;font-size: 12px;"> Admin Centers</span>
+                
+            </div>
+            <div onclick="sidenavminimize()" class="minimize_icon"><i class="fa fa-chevron-left" aria-hidden="true"></i></div>
+  </div>
+       <div class="icon_nav_inner" id="icon_nav" style="display:none;">
+           <ul><li><a href="#" title="Organization home"onclick="sidenavmaximize()"><i class="fa fa-home" style="font-size:18px;margin-left: -3px;"></i></a></li>
+               <li><a href="#" title="Users"onclick="sidenavmaximize()"><i class="fa fa-user-o"></i></a></li>
+               <li><a href="#" title="Groups"onclick="sidenavmaximize()"><i class="fa fa-users"></i></a></li>
+               <li><a href="#" title="Subscription & License"onclick="sidenavmaximize()"><i class="fa fa-id-card-o"></i></a></li>
+               <li><a href="#" title="Payments"onclick="sidenavmaximize()"><i class="fa fa-credit-card"></i></a></li>
+               <li><a href="#" title="Settings"onclick="sidenavmaximize()"><i class="fa fa-cogs"></i></a></li>
+               <li><a href="#" title="Request Approval"onclick="sidenavmaximize()"><i class="fa fa-check-square-o"></i></a></li>
+               <li><a href="#" title="Support"onclick="sidenavmaximize()"><i class="fa fa-wrench"></i></a></li>
+               <li><a href="#" title="Reports"onclick="sidenavmaximize()"><i class="fa fa-line-chart"></i></a></li>
+               <li><a href="#" title="Communication"onclick="sidenavmaximize()"><i class="fa fa-volume-control-phone"></i></a></li>
+           </ul>
+           <span onclick="sidenavmaximize()" class="minimize_icon2"><i class="fa fa-chevron-right" aria-hidden="true"></i></span>
+       </div>
+    </div>
+    <!--end topbar-->
+    <script>
+        //if (document.getElementById("sid_nav_inner").style.visibility == "visible") {
+        //    document.getElementById("sid_nav_inner").setAttribute("style", "transition: visibility 9s ease-in-out;");
+        //}
+        function sidenavminimize() {
+            document.getElementById("side_nav").style.width = "0px";
+            document.getElementById("mainbody").setAttribute("style", "margin-left: 30px; width: 97%;");
+            document.getElementById("sid_nav_inner").style.visibility = "hidden";
+            document.getElementById("icon_nav").style.display = "block";
+}
+
+        function sidenavmaximize() {
+            document.getElementById("side_nav").style.width = "200px";
+            document.getElementById("mainbody").setAttribute("style","margin-left: 200px;width: 85%;");
+            document.getElementById("sid_nav_inner").style.visibility = "visible";
+            document.getElementById("icon_nav").style.display = "none";
+        }
+        
+    </script>
+    <style>
+#side_nav{
+    transition: width .3s ease-in-out;
+    
+}
+/*#sid_nav_inner{transition:visibility 4s ease-in-out;}*/
+    </style>
+    <div class="body-main-wrap" id="mainbody" style="">
+        
+            @RenderBody()
+       
+    </div>
+    @*Hare Krushna*@
+    @*Plus Symel Popup*@
+    <div class="flyout-sm  flyout ember-view" id="ember1033-bolt1" style="height:220px;margin-right:0;width:370px;display:none;" @*style="font-size: 14px;font-family: calibri; width: 293px; margin-right: 249px;height: 246px;"*@>
+        <!-- <div class="row">
+             <ul class="list-inline  k-content">
+                 <li style="float: left;">
+                     <ul class="list-unstyled">
+                         <li class="header">
+                             <svg class="icon icon-sm align-middle-cross1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                 <path d="M384 352H148.5c-6.9 0-13-4.4-15.2-10.9l-61.4-175c-1.6-3.7-5.2-6.1-9.2-6.1H48.5c-8.6 0-16-6.6-16.4-15.2-.4-9.2 6.9-16.8 16-16.8h32.8c6.9 0 13 4.4 15.2 10.9l61.4 175c1.6 3.7 5.2 6.1 9.2 6.1h199.6c4.2 0 7.9-2.6 9.4-6.6l27.9-108c2.4-6.5-2.4-13.4-9.4-13.4H176.5c-8.6 0-16-6.6-16.4-15.2-.4-9.2 6.9-16.8 16-16.8h255.6c4 0 8 1.4 11 4.1 5.1 4.6 6.6 11.8 4.2 17.9l-48 160c-2.5 6-8.4 10-14.9 10z"></path>
+                                 <circle cx="192" cy="416" r="32"></circle>
+                                 <circle cx="352" cy="416" r="32"></circle>
+                                 <path d="M192 295.5c-1.1 0-2.3-.3-3.3-.8-3.7-1.9-5.2-6.4-3.4-10.1l32-64c1.9-3.7 6.4-5.2 10.1-3.4 3.7 1.9 5.2 6.4 3.4 10.1l-32 64c-1.4 2.7-4.1 4.2-6.8 4.2zm64 0c-1.1 0-2.3-.3-3.3-.8-3.7-1.9-5.2-6.4-3.4-10.1l32-64c1.9-3.7 6.4-5.2 10.1-3.4 3.7 1.9 5.2 6.4 3.4 10.1l-32 64c-1.4 2.7-4.1 4.2-6.8 4.2zm64 0c-1.1 0-2.3-.3-3.3-.8-3.7-1.9-5.2-6.4-3.4-10.1l32-64c1.9-3.7 6.4-5.2 10.1-3.4 3.7 1.9 5.2 6.4 3.4 10.1l-32 64c-1.4 2.7-4.1 4.2-6.8 4.2z"></path>
+                             </svg>&nbsp;&nbsp;Sales
+                         </li>
+                         <li><a data-ember-action="" data-ember-action-314="314">+ &nbsp;Customer </a></li>
+                         <li>
+                             <a id="ember317" href="#" class="ember-view">+ &nbsp;Sales Order </a>
+                         </li>
+                         <li>
+                             <a id="ember371" href="#" class="ember-view">+ &nbsp;Package </a>
+                         </li>
+                         <li>
+                             <a id="ember383" href="#" class="ember-view">+ &nbsp;Invoices </a>
+                         </li>
+                         <li>
+                             <a id="ember401" href="#" class="ember-view">+ &nbsp;Delivery Challans </a>
+                         </li>
+                     </ul>
+                 </li>
+
+
+                 <li style="float: right;">
+                     <ul class="list-unstyled">
+                         <li class="header">
+                             <svg class="icon icon-sm align-middle-cross1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                 <path d="M256 0c-53 0-96 43-96 96v64h32V96c0-35.3 28.7-64 64-64s64 28.7 64 64v64h32V96c0-53-43-96-96-96z">
+                                 </path>
+                                 <path d="M416 160v320H96V160h320M96 128c-17.7 0-32 14.3-32 32v320c0 17.7 14.3 32 32 32h320c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32H96z"></path>
+                                 <circle cx="176" cy="208" r="16">
+                                 </circle>
+                                 <circle cx="336" cy="208" r="16"></circle>
+
+                             </svg>
+                             &nbsp;&nbsp;Purchases
+                         </li>
+                         <li><a data-ember-action="" data-ember-action-413="413">+ &nbsp;Vendor </a></li>
+                         <li>
+                             <a id="ember414" href="#/purchaseorders/new" class="ember-view">+ &nbsp;Purchase Orders </a>
+                         </li>
+                         <li>
+                             <a id="ember432" href="#/bills/new" class="ember-view">+ &nbsp;Bills </a>
+                         </li>
+                     </ul>
+                 </li>
+             </ul>
+         </div>-->
+        <!--<div class="row" style="">
+            <div class="row" style="margin-top: 9px;">
+
+                <ul class="list-inline  k-content">
+                    <li style="float: left;">
+                        <ul class="list-unstyled">
+                            <li class="header">
+                                @*<span class="text-draft">*@
+                                <svg class="icon icon-sm align-middle-cross1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25.7 25.7">
+                                    <path d="M19.8 11.2l-6.3-7.7c-.4-.6-.8-.6-1.3 0L6 11.2H-.2v1.6h1.6l3.3 9.8H21l3.3-9.8h1.6v-1.6h-6.1zm-7-5.9l4.8 5.9H8.1l4.7-5.9zM19.9 21h-14l-2.7-8.1h19.5L19.9 21z">
+                                    </path>
+                                    <path d="M8.3 16.2h9v1.1h-9z"></path>
+                                </svg>
+                                &nbsp;&nbsp;Items
+                            </li>
+
+
+
+
+
+
+                            <li>
+                                <a id="ember444" href="#" class="ember-view">+ &nbsp;Items </a>
+                            </li>
+                            <li>
+                                <a id="ember458" href="#" class="ember-view">+ &nbsp;Item Groups </a>
+                            </li>
+
+
+
+
+                            <!---->
+        <!-- <li>
+                            <a id="ember470" href="#" class="ember-view">+ &nbsp;Inventory Adjustments </a>
+                        </li>
+
+                    </ul>
+
+                    @*</ul>*@
+                </li>
+            </ul>
+
+
+        </div>-->
+
+
+        <div style="display: flex;flex-wrap: wrap;justify-content: flex-start;background:lightgray;">
+            <div class="additems-heading">
+                <h5 style="float:left;font-size:17px;margin-left: 20px;">Add Items</h5>
+
+            </div>
+            <div style="position: absolute;width: 33%;margin-top: 45px;padding: 15px;
+                                    height:70%;padding-top: 0;padding-right:2px;">
+                <p style="float:left;margin-bottom:0;margin-left: 5px;font-size: 14px;color: black;">Sales</p>
+                <h6 style="padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Customer</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:18px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Sales Order</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Package</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Invoices</a>
+                </h6>
+
+                <h6 style="margin-top:0;float:left;margin-bottom:0;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 12px;">Delivery Challans</a>
+                </h6>
+            </div>
+
+            <div style="position: absolute;width: 33%;margin-top: 45px;padding: 15px;
+                                    margin-left:33%;height:70%;padding-top: 0;">
+                <p style="float:left;margin-bottom:0;margin-left: 5px;font-size: 14px;color: black;">Purchages</p>
+
+                <h6 style="padding-right:37px;float:left;margin-bottom:4px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Customer</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:18px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Sales Order</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Package</a>
+                </h6>
+
+            </div>
+
+            <div style="position: absolute;width: 33%;margin-top: 45px;padding: 15px;
+                                   margin-left:66%;height:70%;padding-top: 0;">
+                <p style="float:left;margin-bottom:0;margin-left: 5px;font-size: 14px;color: black;">Purchages</p>
+
+                <h6 style="padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Customer</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:18px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Sales Order</a>
+                </h6>
+
+                <h6 style="margin-top:0;padding-right:37px;float:left;margin-bottom:5px;font-size:14px;margin-left:4px;">
+                    <a href="#" class="additems-hover" style="padding:0;margin:0;padding-bottom:1px;color: gray;font-family: sans-serif;
+    font-size: 13px;">Package</a>
+                </h6>
+            </div>
+
+
+
+
+        </div>
+    </div>
+    <style>
+        .align-middle-cross1 {
+            width: 20px;
+            height: 20px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 42px;
+            left: 847px;
+            z-index: 1000;
+            min-width: 160px;
+            padding: 5px 0;
+            margin: 2px 0 0;
+            list-style: none;
+            font-size: 15px;
+            text-align: left;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border: 1px solid rgba(0,0,0,.15);
+            border-radius: 2px;
+            -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+            box-shadow: 0 6px 12px rgba(0,0,0,.175);
+            background-clip: padding-box;
+            height: 251px;
+            width: 297px;
+        }
+
+        .list-inline {
+            padding: 10px;
+            list-style-type: none;
+            margin-left: 0px !important;
+        }
+
+            .list-inline li a:hover {
+                background-color: #7ea700;
+                cursor: pointer;
+            }
+
+        .list-unstyled {
+            /*padding: 10px;*/
+            list-style-type: none;
+        }
+
+        .quik-add .dropdown-menu .line-around-text > span {
+            background: #fff;
+            padding: 0 10px;
+            margin-left: 50px;
+        }
+
+        .quik-add .dropdown-menu {
+            margin-top: 6px;
+            min-width: 290px;
+        }
+
+
+
+
+            .quik-add .dropdown-menu > ul {
+                margin: 10px;
+            }
+
+        .quik-add .list-unstyled li a {
+            display: block;
+            padding: 7px 18px;
+            color: #666;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .list-inline > li {
+            display: inline-block;
+        }
+
+        li > a {
+            background: 0 0;
+            text-decoration: none;
+        }
+
+        .quik-add .dropdown-menu > ul {
+            margin: 9px;
+        }
+
+        .quik-add .list-inline > li {
+            vertical-align: top;
+        }
+
+        .quik-add .dropdown-menu > ul {
+            margin: 10px;
+        }
+
+        .quik-add .dropdown-menu .line-around-text {
+            border-bottom: 1px solid #e6e6e6;
+            height: 7px;
+        }
+
+        #ember1033-bolt1 {
+            font-size: 14px;
+            font-family: calibri;
+            width: 293px;
+            margin-right: 249px;
+            height: 246px;
+        }
+    </style>
+    @*End Plus Symbol*@
+    <style>
+        #notificationdiv {
+            padding: 0px 6px 0px 4px;
+        }
+
+        .date1:link {
+            color: #0070c0 !important;
+            padding-bottom: 6px;
+            text-decoration: none !important;
+            padding-right: 6px;
+        }
+
+        .date1:hover {
+            color: #0070c0 !important;
+            padding-bottom: 6px;
+            text-decoration: none !important;
+            border-bottom: 1px solid #0070c0;
+        }
+
+        .date1:visited {
+            color: #0070c0 !important;
+            padding-bottom: 6px;
+            text-decoration: none !important;
+            border-bottom: none;
+        }
+
+        .noti-heading {
+            font-size: 12px;
+            font-family: sans-serif;
+            color: #000;
+            font-weight: 600;
+            margin-left: -4px;
+        }
+
+        .noti-desc {
+            padding: 9px 14px 0px 12px;
+            margin-bottom: 0px;
+            font-size: 12px;
+            font-family: sans-serif;
+            color: #000;
+        }
+
+        #notificationdiv img {
+            margin-left: 3px;
+            box-shadow: 0px 0px 1px 2px #ccc;
+            border-radius: 30px;
+            margin-top: 11px;
+        }
+    </style>
+    @*notification Anita*@
+    <div id="ember1033-alarm" class="flyout-sm  flyout ember-view" style="display:none">
+        <div class="flyout-header aliceblue-bg" id="divnot" style="font-family:Calibri;">
+            <div style="background-color: #f2f2f2;line-height: 3em;font-family: calibri">
+                <div style="width: 95%;margin-left: 10px;">
+                    <span>
+                        <b style="color: #636363;font-size: 14px;">Notification</b>
+                    </span>
+                    @*<svg class="icon icon-sm align-middle-cross" viewBox="0 0 512 512" id="close-alarm">
+                            <path d="M466.745 0L256 210.745 45.255 0 0 45.254 210.745 256 0 466.745 45.255 512 256 301.255 466.745 512 512
+                                  466.745 301.255 256 512 45.254z"></path>
+                        </svg>*@
+                    <span id="close-alarm" style="cursor:pointer;text-align:left;float: right;font-size: 10px;">
+                        &#10006;
+                    </span>
+                </div>
+            </div>
+
+            <div class="user-pro">
+                @*<span class="pull-right cursor-pointer" data-ember-action="" data-ember-action-1051="1051">
+                    </span>*@
+                <div style="border-bottom: 1px solid #ccc;padding-bottom:5px;margin-bottom: 7px;padding-left: 11px;">
+                    <a href="#" id="aaf" @*style="text-decoration:none;font-size:12px"*@ class="date1"> By Date</a>
+                    <a href="#" id="aat" class="date1"> By Type</a>
+                    <a href="#" id="aapp" class="date1"> By Priority</a>
+                </div>
+
+                <div id="notificationdiv"></div>
+            </div>
+        </div>
+    </div>
+    @*end notification*@
+
+    <div id="ember1033-question" class="flyout-sm  flyout ember-view" style="display:none">
+        <div class="flyout-header aliceblue-bg">
+            @*<svg class="icon icon-sm align-middle-cross" viewBox="0 0 512 512" id="close-question">
+                    <path d="M466.745 0L256 210.745 45.255 0 0 45.254 210.745 256 0 466.745 45.255 512 256 301.255 466.745 512 512
+                                  466.745 301.255 256 512 45.254z"></path>
+                </svg>*@
+            <div class="user-pro">
+                <span class="pull-right cursor-pointer" data-ember-action="" data-ember-action-1051="1051">
+                </span>
+                <div class="clearfix text-center">
+                    <p>
+                        How can I Help You ?
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#body1").mouseup(function (e) {
+                var subject = $("#ember1033,#ember1033-question,#ember1033-alarm");
+                if (e.target.id != subject.attr('id') && !subject.has(e.target).length) {
+                    subject.hide();
+                }
+            });
+        });
+    </script> 
+    <div id="ember1033" class="flyout-sm  flyout ember-view" style="box-shadow: none;
+    height: 311px;
+    position: absolute;
+    top: 46px;
+    margin: 0;
+    right: 0px;">
+        @*style="overflow-y:scroll;"*@
+        @********************************Akankshya************************************************@
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        @*<svg class="icon icon-sm align-middle-cross" viewBox="0 0 512 512" id="close-profile">*@
+        <path d="M466.745 0L256 210.745 45.255 0 0 45.254 210.745 256 0 466.745 45.255 512 256 301.255 466.745 512 512
+    466.745 301.255 256 512 45.254z"></path>
+        @*</svg>*@
+        <div class="user-pro" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);">
+            <span class="pull-right cursor-pointer" data-ember-action="" data-ember-action-1051="1051">
+            </span>
+
+            <div class="clearfix" style="width:100%;padding:0;margin:0;">
+                <div style="border-bottom:1px solid lightgray;padding-bottom: 3px;background:white;width:100%;height:60px;">
+                    <div style="width: 23%;display: inline-block;position: relative;float: left;padding: 5px 0px 0px 9px;">
+                        <img id="profilePic" class="profile-pic" src="" style="height: 46px;width: 46px;border-radius: 30px;">
+                    </div>
+                    <div class="section" style="margin-left: 59px;width: 76%;display: inherit;line-height: 1.1em;padding: 3px 0px 0px 6px;">
+                        <span id="UserName" class="over-flow" style="color:#079af5;text-transform:capitalize;"> </span><br />
+                        @*<span class="text-muted font-xs user-id" style="padding-left: 62px;font-size: 10px;">XYZ System Private Limited</span>*@
+                        <h6 id="companyName" class="text-muted over-flow" style="margin: 4px 0px;color: #b9b9b9;font-size: 12px;"></h6>
+                        <h6 id="emai" class="text-muted over-flow" style="margin:0;color:#b9b9b9;font-size:10px;"></h6>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="clear-fix" style="padding:1px"></div>
+        </div>
+        <style>
+            h3 {
+                border-bottom: 1px solid #e4e4e4;
+            }
+
+            .k-item1 {
+                height: 25px;
+                /*margin-left: 10px;*/
+                line-height: 2.1em;
+                padding: 2px 1em;
+                /*color: #fff;*/
+            }
+
+            #listView {
+                border: none;
+                color: darkblue;
+            }
+
+            ul li:hover {
+                background-color: #8ebc00 !important;
+                color: #fff;
+            }
+
+            #panelbar12 li:hover img {
+                display: block;
+            }
+
+            /*#xyz:hover {
+                font-weight:bold;
+                background-color: #e4e4e4 !important;
+            }*/
+
+            .material-icons {
+                font-family: 'Material Icons';
+                font-weight: normal;
+                font-style: normal;
+                /*margin-right: 8px;*/
+                margin-top: 5px;
+                font-size: 15px;
+                color: #787878;
+                float: right;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+            }
+        </style>
+        <div class="contact profile-detl" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);border-bottom: 1px solid lightgray;">
+            <ul class="k-widget k-panelbar k-reset k-header k-content" id="panelbar12" data-role="panelbar" tabindex="0" role="menu">
+                <li class="k-item1 k-state-default k-first" style="cursor:pointer;">
+                    My Profile <i style="font-size:15px;float:right;margin-top: 4px;color: #787878;" class="fa">&#xf2be;</i>
+                    @*<span class="">
+                            @*My Profile <img alt="image" class="k-content" src="~/Images/DPUserProfile/download profile.jpg" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 4px;">
+                        </span>*@
+                </li>
+                <li class="k-item1 k-state-default k-first " style="cursor:pointer;" onclick="openchangepswddiv()">
+                    <span class="">
+                        Change Password <i class="material-icons">&#xe0da;</i> @*<img alt="image" class="k-image" src="~/Images/DPUserProfile/download change password.jpg" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 8px;">*@
+                    </span>
+                </li>
+                <li class="k-item1 k-state-default k-first" style="cursor:pointer;" onclick="openchangefeeddiv()">
+                    <span class="">
+                        Feedback<i class="material-icons">&#xe87f;</i> @*<img alt="image" class="k-image" src="~/Images/DPUserProfile/download feedback.png" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 8px;">*@
+                    </span>
+                </li>
+                <li class="k-item1 k-state-default k-first" style="cursor:pointer;" onclick="openchangereqdiv()">
+                    <span class="">
+                        Service Request <i class="material-icons">&#xe869;</i>@*<img alt="image" class="k-image" src="~/Images/DPUserProfile/download service Request.png" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 8px;">*@
+                    </span>
+                </li>
+                <li class="k-item1 k-state-default k-first" style="cursor:pointer;" onclick="openLockScreen()">
+                    <span class="">
+                        Lock Screen <i style="font-size:15px;float:right;margin-top: 4px;margin-right: 3px;color: #787878;" class="fa">&#xf023;</i>
+                        @*<img alt="image" class="k-image" src="~/Images/DPUserProfile/images lock screen.png" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 4px;">*@
+                    </span>
+                </li>
+
+                <li class="k-item1 k-state-default k-first" style="cursor:pointer;" onclick="LogoutUesr()">
+                    <span class="">
+                        Log Out <i style="font-size:15px;float:right;margin-top: 4px;margin-right:1px;color: #787878;" class="fa">&#xf011;</i> @*<img alt="image" class="k-image" src="~/Images/DPUserProfile/download logout.jpg" style="float:right;height:15px;width:15px;margin-top: 4px;margin-right: 4px;">*@
+                    </span>
+                </li>
+
+            </ul>
+
+        </div>
+        <div class="clear-fix" style="margin-left:0px;padding-left:0px;height:auto;background: white;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);" id="heightScript">
+
+            <p style="font-size: 11px;color:dodgerblue;padding-left: 12px;padding-top: 7px;">DIRECTORY:</p>
+            @*<script type="text/x-kendo-tmpl" id="template">*@
+            <div class="product12" id="xyz" style="font-size: 12px;font-family: sans-serif;margin-bottom: 2px;">
+                <div id="listViewDomain"></div>
+
+
+
+
+                @*<h7>#:CompanyName#</h7><br />
+                    <h7> #:DomainName# </h7>*@
+                @*<div class="clear-fix" style="padding:1px;"></div>*@
+            </div>
+
+            <script type="text/x-kendo-tmpl" id="templatedomain">
+                <div class="listView11" id="list121">
+
+                    <div class="profile-menu-list" style="padding: 6px 0px 7px 12px;margin-left: 0px;">
+
+                        <span class="">#:Tenent_CompanyName#</span><br />
+                        <span class="">#:Tanent_Name#</span><br />
+                    </div>
+
+                </div>
+            </script>
+            <style>
+                .profile-menu-list span {
+                    margin-bottom: 3px;
+                }
+                /*.profile-menu-list:hover{
+                    border-bottom:1px solid #ccc;
+                }*/
+            </style>
+            @*</script>*@
+            @*<div class="demo-section k-content wide">
+                            @(Html.Kendo().ListView<KENCloudAdmin.Areas.UserLanding.Controllers.LandingController.Tenancymodel>(Model)
+                .Name("listView")
+                .TagName("div")
+                .ClientTemplateId("template")
+                .DataSource(dataSource => dataSource
+                .ServerOperation(false)
+
+                )
+                .Selectable(selectable => selectable.Mode(ListViewSelectionMode.Single))
+                            )
+                        </div>*@
+
+        </div>
+    </div>
+
+    @***************************************End Akankshya****************************************************************@
+    <style>
+        .align-middle-cross {
+            width: 11px;
+            height: 11px;
+            float: right;
+            color: gray;
+            font-family: normal;
+            font-style: normal;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        #ember1033.flyout.flyout-sm {
+            width: 249px !important;
+            height: 400px;
+        }
+
+        .flyout.flyout-sm {
+            width: 400px;
+            position: fixed;
+        }
+
+        .flyout {
+            position: absolute;
+            top: 44.5px;
+            bottom: 0;
+            right: 0;
+            -webkit-transition: right .2s ease-in-out;
+            -o-transition: right .2s ease-in-out;
+            transition: right .2s ease-in-out;
+            box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);
+            width: 450px;
+            z-index: 1000001;
+            background-color: #fff;
+        }
+
+        .flyout-header {
+            /*padding: 10px 20px;*/
+            border-bottom: 1px solid #ededed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .aliceblue-bg {
+            background: #F3F8FE;
+        }
+        /*#listView1:hover{
+            background:#8fb713;
+        }*/
+
+        /*#listView1 tbody tr .profile-menu-list:hover {
+         background: #8fb713;*/
+        .profile-menu-list:hover {
+            background: #8fb713;
+        }
+
+        .k-widget:hover {
+            background: white !important;
+        }
+    </style>
+    <script>
+       
+        $(document).ready(function () {
+            $("#ember1033,#logosub,#ember1033-bolt1,#ember1033-alarm,#ember1033-question").hide();
+           // $('body').css('overflow', 'hidden');
+            //$("#body1").mouseup(function (e) {
+            //    var subject = $("#ember1033");
+            //    if (e.target.id != subject.attr('id') && !subject.has(e.target).length) {
+            //        subject.hide();
+            //    }
+            //});
+            //  $(window).load(function () {
+            // $("#ember1033-question").hide();
+            //$("#ember1033-alarm").hide();
+             $("#ember1033").hide();
+            //$("#ember1033-bolt1").hide();
+            $("#logosub").hide();
+
+            var regId = $('#test1').data('text');
+            //Bind DomainList
+            $.ajax({
+                type: "POST",
+                url: "/UserList/BindProfileData",
+                data: { 'regId': regId },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (profileData) {
+
+                    // alert(profileData.FullName);
+                    //var imageSrc =
+                    debugger;
+                    $("#ProfileUserName").text(profileData.FullName);
+                    //$(".ProfileImage").src(profileData.Uplaod_ImageURL);
+                    $("#ProfileImage").attr("src", profileData.Uplaod_ImageURL);
+                },
+                error: function () {
+                }
+            });
+
+        });
+        $("#slide-bolt").click(function () {
+            $("#logosub").hide();
+            $("#ember1033-question").hide();
+            $("#ember1033-alarm").hide();
+            $("#ember1033").hide();
+
+            if ($("#ember1033-bolt1").is(":hidden")) {
+                $("#ember1033-bolt1").show();
+            } else if ($("#ember1033-bolt1").is(":visible")) {
+                $("#ember1033-bolt1").hide();
+            }
+        })
+        $("#slide-question").click(function () {
+            $("#logosub").hide();
+            $("#ember1033-bolt1").hide();
+            $("#ember1033-alarm").hide();
+            $("#ember1033").hide();
+            if ($("#ember1033-question").is(":hidden")) {
+                $("#ember1033-question").show();
+            } else if ($("#ember1033-question").is(":visible")) {
+                $("#ember1033-question").hide();
+            }
+        })
+
+
+
+        $("#profile-slide").click(function () {
+            debugger;
+
+            var regId = $('#test1').data('text');
+
+            $.ajax({
+                type: "POST",
+                url: "/UserList/BindProfileData",
+                data: { 'regId': regId },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (profileData) {
+
+                    //alert(profileData.Uplaod_ImageURL);
+                    debugger;
+                    // $(".ProfileUserName").text(profileData.User_EmailId);
+                    $("#companyName").text(profileData.companyName);
+                    $("#emai").text(profileData.User_EmailId);
+                    $("#UserName").text(profileData.FullName);
+
+
+                    $("#profilePic").attr("src", profileData.Uplaod_ImageURL);
+                },
+                error: function () {
+                }
+            });
+            //Bind DomainList
+            $.ajax({
+                type: "POST",
+                url: "/UserList/BindDomainData",
+                data: { 'regId': regId },
+                dataType: "json",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                   // alert("raha");
+                    debugger;
+                    var dataSource = new kendo.data.DataSource({
+                        data: data.Data
+                        //, pageSize: 10
+                    });
+
+                    $("#listViewDomain").kendoListView({
+                        dataSource: dataSource,
+                        dataBound: onDataBound,
+                        template: kendo.template($("#templatedomain").html()),
+
+                    });
+                },
+                error: function () {
+                }
+            });
+
+            // To Highlight User Domain in which he/she has logged in
+
+            function onDataBound(e) {
+                debugger;
+                var tanentCompName1 = $('#tanentCompName').data('text');
+                var listview = $("#listViewDomain").data("kendoListView");
+                var data = listview.dataItems();
+                debugger;
+                var count = listview.dataSource.total();
+                //Set height of listview when listview count exceeds 5
+                if (count > 5) {
+
+                    $("#heightScript").css('overflow', 'auto');
+                    $("#heightScript").height(218);
+                }
+                $.each(data, function (i, Tenent_CompanyName) {
+                    debugger;
+                    if (data[i].Tenent_CompanyName == tanentCompName1) {
+                        var item = data[i].Tenent_CompanyName;
+                        var uid = $(".listView11", data.Tenent_CompanyName).data("uid");
+                        $("#listViewDomain").find("div[data-uid=" + uid + "]").css('background', '#8fb713');
+                    }
+                });
+
+
+                //Click event of items of domain listview
+
+              
+                $(".listView11").on("click", function () {
+                    debugger;
+                    var listView = $("#listViewDomain").data("kendoListView");
+                    var idx = $(this).index();
+                    var item = listView.dataSource.view()[idx];
+                    //alert(item.Tanent_Name);
+                    $.ajax({
+                        type: "POST",
+                        url: "/UserList/GetUrl",
+                        data: { 'tanentId': item.TenentId },
+                        dataType: "json",
+                        success: function (data) {
+                           // alert("raha");
+                            debugger;
+                            if (data.status == "1") {
+                                if (data != null) {
+                                    // window.location = "http" + "/" + item.Tanent_Name;
+                                    //window.location.href = "http://" + "/" + data;
+                                    window.location.href = "http://" + "/" + data.url + "?DbName=" + data.db + "&" + "Containername=" + data.container + "&" + "tanentname=" + data.tanentname + "&regId=" + data.regId + "&tanentId=" + data.tanentid;
+                                }
+                                else {
+
+                                }
+                            }
+                            else {
+                                window.location.href = "/CustomizedLogin/SingleSignOn/LicenseExpired";
+                            }
+                        }
+                    });
+
+                });
+            }
+
+            
+
+
+
+
+
+
+            $("#logosub").hide();
+            $("#ember1033-bolt1").hide();
+            $("#ember1033-question").hide();
+            $("#ember1033-alarm").hide();
+
+            if ($("#ember1033").is(":hidden")) {
+                $("#ember1033").show();
+            } else if ($("#ember1033").is(":visible")) {
+                $("#ember1033").hide();
+            }
+        })
+
+        $("#bt1").click(function () {
+
+            $("#ember1033-question").hide();
+            $("#ember1033-bolt1").hide();
+            $("#ember1033-question").hide();
+            $("#ember1033-alarm").hide();
+
+            if ($("#logosub").is(":hidden")) {
+                $("#logosub").show();
+            } else if ($("#logosub").is(":visible")) {
+                $("#logosub").hide();
+            }
+        })
+
+        //close Button Work
+        $("#close-question").click(function () {
+            $("#ember1033-question").hide();
+        });
+        $("#close-alarm").click(function () {
+            $("#ember1033-alarm").hide();
+        });
+        $("#close-profile").click(function () {
+            $("#ember1033").hide();
+        });
+
+        //End Close Button
+        //$(document).click(function (event) {
+        //    $("#ember1033-question").hide();
+        //    $("#ember1033-bolt1").hide();
+        //    $("#ember1033-question").hide();
+        //    $("#ember1033-alarm").hide();
+        //    $("#logosub").hide();
+        //});
+
+
+
+        //---------------notification code anita
+        $("#slide-alarm").click(function () {
+            $("#logosub").hide();
+            $("#ember1033-bolt1").hide();
+            $("#ember1033-question").hide();
+            $("#ember1033").hide();
+
+            if ($("#ember1033-alarm").is(":hidden")) {
+                $("#ember1033-alarm").show();
+            } else if ($("#ember1033-alarm").is(":visible")) {
+                $("#ember1033-alarm").hide();
+            }
+            ////debugger
+            $.ajax({
+                type: "POST",
+                url: "/Landing/GetNotificationdata",
+                //  content: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (d) {
+
+                    mydiv = document.getElementById("notificationdiv");
+                    mydiv.innerHTML = "";
+                    for (var i = 0; i < d.length; i++) {
+                        mydiv.innerHTML += "<div id='notificationdiv" + d[i].Notificationid + "' class='clearfix text-center k-content notifdivcss' style='border-left-color:" + d[i].NotificationPriority + "' > <p class='p_' style='font-size: 12px;color: #625d5d;line-height: 0em'> <b class='noti-heading'>" + d[i].NotificationTittle + " </b> <span id='close" + d[i].Notificationid + "' onclick='closeember1033-alarm(this)' style='cursor:pointer;text-align:left;float: right;font-size:10px;'>&#10006;</span> </p> <table><tbody><tr><td> <span> <img src=" + d[i].NotificationImage + " width='30' height='30' /></span></td><td><p class='noti-desc'> " + d[i].NotificationDescription + "</p></td></tr></tbody></table><p class='p_' style='padding-left: 38px;margin-left: 25px;height: 23px;margin-top: 1px'><span style=''> " + d[i].NotificationDate + "</span> <span style='float: right;'><button class='k-button' style='width:50% ;border-color: #64ac88;color: #64ac88;border-radius: 3px;padding: 1px 14px 1px 11px;background:none;'>Approve</button><button class='k-button' style='width:50%;border-radius: 3px;border-color: #ec7777;color: #ec7777;padding: 1px 14px 1px 11px;background:none;' >Reject</button></span></p></div>";
+
+
+
+
+                    }
+
+                },
+                //error: function (xhr, textStatus, errorThrown) {
+                //    // TODO: Show error
+                //}
+            });
+        })
+        $("a#aaf").bind('click', function () {
+            $.ajax({
+                type: "get",
+                url: "/Landing/GetNotification_date",
+                //  content: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (d) {
+
+                    mydiv = document.getElementById("notificationdiv");
+                    mydiv.innerHTML = "";
+                    for (var i = 0; i < d.length; i++) {
+                        mydiv.innerHTML += "<div id='notificationdiv" + d[i].Notificationid + "' class='clearfix text-center k-content notifdivcss' style='border-left-color:" + d[i].NotificationPriority + "' > <p class='p_' style='line-height: 0em'> <b class='noti-heading'>" + d[i].NotificationTittle + " </b> <span id='close" + d[i].Notificationid + "' onclick='closenotification(this)' style='cursor:pointer;text-align:left;float: right;font-size:10px;'>&#10006;</span> </p> <table><tbody><tr><td> <span> <img src=" + d[i].NotificationImage + " width='30' height='30' /></span></td><td><p class='noti-desc'> " + d[i].NotificationDescription + "</p></td></tr></tbody></table><p class='p_' style='padding-left: 38px;margin-left: 25px;height: 23px;margin-top: 1px'><span> " + d[i].NotificationDate + "</span> <span style='float: right;'><button class='k-button' style='border-color: #64ac88;color: #64ac88;width:50%;background:none;border-radius:3px;padding: 1px 14px 1px 11px;'>Approve</button><button class='k-button' style='width:50%;background:none;border-color: #ec7777;color: #ec7777;border-radius:3px;padding: 1px 14px 1px 11px;' >Reject</button></span></p></div>";
+
+
+                    }
+                },
+                //error: function (xhr, textStatus, errorThrown) {
+                //    // TODO: Show error
+                //}
+            });
+        });
+        $("a#aapp").bind('click', function () {
+            $.ajax({
+                type: "get",
+                url: "/Landing/GetNotification_Priority",
+                //  content: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (d) {
+
+                    mydiv = document.getElementById("notificationdiv");
+                    mydiv.innerHTML = "";
+                    for (var i = 0; i < d.length; i++) {
+                        mydiv.innerHTML += "<div id='notificationdiv" + d[i].Notificationid + "' class='clearfix text-center k-content notifdivcss' style='border-left-color:" + d[i].NotificationPriority + "' > <p class='p_' style='line-height: 0em'> <b class='noti-heading'>" + d[i].NotificationTittle + " </b> <span id='close" + d[i].Notificationid + "' onclick='closenotification(this)' style='cursor:pointer;text-align:left;float: right;font-size:10px;'>&#10006;</span> </p> <table><tbody><tr><td> <span> <img src=" + d[i].NotificationImage + " width='30' height='30' /></span></td><td><p class='noti-desc'> " + d[i].NotificationDescription + "</p></td></tr></tbody></table><p class='p_' style='padding-left: 38px;margin-left: 25px;height: 23px;margin-top: 1px'><span> " + d[i].NotificationDate + "</span> <span style='float: right;'><button class='k-button' style='border-color: #64ac88;color: #64ac88;width:50%;background:none;border-radius:3px;padding: 1px 14px 1px 11px;'>Approve</button><button class='k-button' style='width:50%;background:none;border-color: #ec7777;color: #ec7777;border-radius:3px;padding: 1px 14px 1px 11px;' >Reject</button></span></p></div>";
+                    }
+                },
+                //error: function (xhr, textStatus, errorThrown) {
+                //    // TODO: Show error
+                //}
+            });
+        });
+        function closenotification(ob) {
+            ////debugger;
+            var id = ob.id.substring(5);
+            var div = "notificationdiv" + id;
+            document.getElementById(div).style.display = "none";
+        }
+        //--------------end notification
+
+
+
+        // Log out Code
+
+      function  LogoutUesr() {
+            $.ajax({
+                type: "POST",
+                url: "/UserList/Logout",
+                // content: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result == 1) {
+                        window.location.href = "/CustomizedLogin/SingleSignOn/Index"
+
+                    }
+                }
+            });
+        };
+
+
+
+
+
+
+    </script>
+    @*End Hare*@
+
+    <div style="display:none">
+        @{var regId = ""; }
+        @if (HttpContext.Current.Session["RegId"] != null && HttpContext.Current.Session["RegId"] != "")
+        {
+            regId = Convert.ToString(@Session["RegId"]);
+        }
+
+        @{var tanentName = ""; }
+        @if (HttpContext.Current.Session["TanentComapnyName"] != null && HttpContext.Current.Session["TanentComapnyName"] != "")
+        {
+            tanentName = Convert.ToString(@Session["TanentComapnyName"]);
+        }
+
+        <span id='test1' data-text="@regId"></span>
+        <span id='tanentCompName' data-text="@tanentName"></span>
+    </div>
+    @*Theme Integration*@
+    @*<script type="text/javascript">
+
+            $(function () {
+               // //debugger;
+                var skinName11 = "metro";
+                var doc1 = document,
+                   kendoLinks = $("link[href*='kendo.']"),
+                   commonLink = kendoLinks.filter("[href*='kendo.common']"),
+                   skinLink = kendoLinks.filter(":not([href*='kendo.common'])"),
+                   href = location.href,
+                   skinRegex = /kendo\.\w+(\.min)?\.css/i,
+                   extension = skinLink.attr("rel") === "stylesheet" ? ".css" : ".less",
+                   newSkinUrl = skinLink.attr("href").replace(skinRegex, "kendo." + skinName11 + "$1" + extension);
+                var browsers = kendo.support.browser,
+                         oldSkinName = $(doc1).data("kendoSkin"),
+                         newLink;
+
+                if (browsers.msie && browsers.version < 10) {
+                    newLink = doc1.createStyleSheet(newSkinUrl);
+                } else {
+                    newLink = skinLink.eq(0).clone().attr("href", newSkinUrl);
+                    newLink.insertBefore(skinLink[0]);
+                }
+
+
+                $(document.body).addClass("k-content");
+
+
+
+            });
+
+        </script>*@
+
+    @*endtheme*@
+
+    @*notification anita*@
+    <style>
+        .notifdivcss {
+            border-left: solid 1px;
+            margin-top: 5px;
+            /* border-left-color: #ff8100; */
+            border-left-width: 8px;
+            background: #dde9ff;
+            border-radius: 5px;
+            padding: 3px 4px;
+            font-size: 12px;
+        }
+
+        /*#divnot {
+                overflow: scroll;
+                height: 600px;
+            }*/
+
+        /*#aaf:hover {
+            text-decoration: underline !important;
+            background-color: white !important;
+            color: #0070c0 !important;
+            text-underline-position: under;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        #aapp:hover {
+            text-decoration: underline !important;
+            background-color: white !important;
+            color: #0070c0 !important;
+            text-underline-position: under;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        #aat:hover {
+            text-decoration: underline !important;
+            background-color: white !important;
+            color: #0070c0 !important;
+            text-underline-position: under;
+            font-weight: bold;
+            font-size: 12px;
+        }*/
+
+        .text-center {
+            text-align: initial !important;
+        }
+
+        .p_ {
+            margin: 10px 7px 5px !important;
+        }
+    </style>
+    @*end notification*@
+    @* akan change password srt*@
+    <script type="text/javascript">
+        $(document).ready(function () {
+            ////debugger;
+            $("#chk1").hide();
+            $("#chk2").hide();
+            $("#chk3").hide();
+            $("#chk4").hide();
+            $("#imgverify").hide();
+            $("#chk5").hide();
+            //  $("#Next").kendoButton({}).data("kendoButton").enable(false);
+            $('#txtconfirmpassword').change(function () {
+                //debugger;
+                if ($('#txtconfirmpassword').val() == "") {
+
+                    document.getElementById('errormsg').innerText = '';
+                }
+                else if ($('#txtconfirmpassword').val() != $('#txtpassword').val()) {
+
+                    document.getElementById('errormsg').innerText = 'Password Not Matched';
+
+                    $("#imgverify").hide();
+                    alert("Password Not Matched");
+                }
+                else {
+
+                    document.getElementById('errormsg').innerText = '';
+                }
+            })
+
+            $('#Next').click(function () {
+                //debugger;
+                $("#divLoader").show();
+                var y = $('#txtpassword').val();
+                var z = $('#txtconfirmpassword').val();
+
+
+                if (z == '' & y == '') {
+                    //debugger;
+                    alert("Please set a Password");
+
+                    var popupNotification = $("#popupNotification").data("kendoNotification");
+                    popupNotification.show({
+                        title: "Error !",
+                        message: "Please set a Password."
+                    }, "error");
+                    $("#divLoader").hide();
+                } else {
+                    if (y == z) {
+                        //debugger;
+                        if (checkpassword()) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/ClientAdmin/Userlist/index",
+                                data: { 'password': $('#txtpassword').val() },
+                                datatype: "json",
+                                cache: false,
+                                success: function (data) {
+                                    if (data == "0") {
+                                        //debugger;
+                                        $("#divLoader").hide();
+                                        document.getElementById('errormsg').innerText = 'Not Changed';
+
+                                    }
+                                    else {
+                                        alert("Password Successfully Changed")
+                                        // $('#chk1').show();
+                                        //debugger;
+                                        $('#errormsg').val('');
+                                        $("#divLoader").hide();
+                                        $("#imgverify").show();
+                                        var popupNotification = $("#popupNotification").data("kendoNotification");
+                                        popupNotification.show({
+                                            title: "Success",
+                                            message: "Password Successfully Changed."
+                                        }, "upload-success");
+
+
+                                    }
+                                },
+                            })
+                        } else {
+
+
+                            var popupNotification = $("#popupNotification").data("kendoNotification");
+                            popupNotification.show({
+                                title: "Error !",
+                                message: "Password criteria not matched."
+                            }, "error");
+                            alert("Password criteria not matched");
+                            $("#divLoader").hide();
+
+                        }
+                    }
+                    else {
+                        //debugger;
+                        alert("New & Confirm Password are Not Matched");
+
+
+                        var popupNotification = $("#popupNotification").data("kendoNotification");
+                        popupNotification.show({
+                            title: "Error !",
+                            message: "New & Confirm Password are Not Matched."
+                        }, "error");
+
+                        $("#imgverify").hide();
+                        $("#divLoader").hide();
+                        $('#txtpassword').val('');
+                        $('#txtconfirmpassword').val('');
+                        $("#chk1").hide();
+                        $("#chk2").hide();
+                        $("#chk3").hide();
+                        $("#chk4").hide();
+                        $("#chk5").hide();
+
+                    }
+                }
+
+            })
+        })
+        function checkpassword() {
+            var pass = $('#txtpassword').val();
+            var upper = 0;
+            var lower = 0;
+            var sym = 0;
+            var num = 0;
+
+            for (var i = 0; i < pass.length; i++) {
+                var va = pass.charCodeAt(i);
+                if (64 < va && va < 91) {
+                    upper++;
+                }
+                else if (96 < va && va < 123) {
+                    lower++;
+                }
+                else if (47 < va && va < 58) {
+                    num++;
+                }
+                else if (34 < va && va < 39 || va == 64) {
+                    sym++;
+                }
+            }
+            if (pass.length > 7 && upper > 0 && lower > 0 && sym > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        function passwordonly() {
+
+            var pass = $('#txtpassword').val();
+            var upper = 0;
+            var lower = 0;
+            var sym = 0;
+            var num = 0;
+
+            for (var i = 0; i < pass.length; i++) {
+                var va = pass.charCodeAt(i);
+                if (64 < va && va < 91) {
+                    upper++;
+                }
+                else if (96 < va && va < 123) {
+                    lower++;
+                }
+                else if (47 < va && va < 58) {
+                    num++;
+                }
+                else if (34 < va && va < 39 || va == 64) {
+                    sym++;
+                }
+            }
+            if (pass.length > 7) {
+                $("#chk1").show();
+            }
+            else {
+                $("#chk1").hide();
+            }
+            if (upper > 0) {
+                $("#chk2").show();
+            }
+            else {
+                $("#chk2").hide();
+            }
+            if (lower > 0) {
+                $("#chk3").show();
+            }
+            else {
+                $("#chk3").hide();
+            }
+            if (num > 0) {
+                $("#chk4").show();
+            }
+            else {
+                $("#chk4").hide();
+            }
+            if (sym > 0) {
+                $("#chk5").show();
+            }
+            else {
+                $("#chk5").hide();
+            }
+
+        };
+
+        function onchangeevent() {
+
+        }
+
+
+
+
+    </script>
+    <div id="Changepasswordlanding" class="flyout-sm  flyout ember-view popup-styl2" style="display:none;">
+        <div class="modal-content modal-css">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 popup-topbar" style="">
+                    <div class="row main">
+                        <span class="popup-round1">CP</span>
+                        <h4 style="">Change Password</h4>
+                        <span onclick="Changepasswordlandingclose()" class="updatePaymentDetailsclose click2close" style="">&times;</span>
+                    </div>
+                </div>
+            </div>
+           
+
+
+            <div class="user-pro">
+             
+                <div id="products-template">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12" id="MainSection">
+                        <div class="form-group" style="margin-bottom: 5px;margin-top: 16px;">
+                            <div class="row" style="padding-top: 0px;">
+                              
+                                    <div class="col-md-3 for-padding-zero" style="padding-left: 3px;">
+                                        <img src="" id="proimg" class="img-responsive" alt="User" style="height: 54px;border-radius: 50%;width: 61px;">
+                                    </div>
+
+
+                                    <div class="col-md-9" style="padding-left: 0px;line-height: 10px; margin-top: 6px;margin-left: -17px;">
+                                        <div class="form-group" @*style="margin-top: -55px;margin-left: 50px;"*@>
+                                            <p id="usname" style="font-size: 14px;font-family: sans-serif;margin-bottom: 6px;color:#0598d4;"></p>
+
+                                            <div class="row" style="padding-top: 0px">
+                                                @(Html.Kendo().Button().Name("Text").Content("AVAILABLE").HtmlAttributes(new
+                                        {
+                                            type = "Available",
+                                            style = "width:90px;font-size:11px;background:#7ea700;border:1px solid #7ea700;color:white;padding:3px;height:25px; "
+                                        })
+                                /*.Events(ev => ev.Click("Availableclick"))*/)
+                                                @*<button class="btn btn-success  pull-right btn-ovdd-cnl" type="reset" style="height: 25px;width: 76px;margin-right: 90px;padding-top: 2px;">Available</button>*@
+                                                @*<p style="color:white;background-color:rgb(126, 167, 1); width:80px;padding-top: 0.6em;height: 21px;text-align: center; ">Available</p>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                              
+                        </div>
+                        @*<div class="row" style="float: left;">
+                            <img src="~/Images/DPUserProfile/download change password.jpg" alt="User" style="height: 25px;width: 25px;"><span><b style="font-size: 15px;">   </b> </span>
+
+                        </div>*@
+                        <div class="row">
+                            @(Html.Label("Change Password"))
+                            </div>
+
+                        <div class="aligncenter" style="height:0;border-top:1px groove ;"></div>
+                        <div class="form-group">
+                            <p style="color:gray;font-size:12px;font-family: sans-serif;margin-top:10px;">Set a new password, which helps to prevent unauthorized access to your account.</p>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0px;">
+                            <div class="row" style="padding-top:5px">
+                                <div class="col-md-3" style="padding-left: 0px;font-size: 12px;font-family: sans-serif;">
+                                    Email
+                                </div>
+                                <div class="col-md-9" style="display:inline-flex;margin-bottom: 2px;">
+                                    <div class="col-md-8">
+                                        @*<span>*@
+                                        @(Html.Kendo().TextBox().Name("txtEmail").HtmlAttributes(new
+                                {
+                                    value = @Session["emails"],
+                                    style = "width: 250px;;margin-left: -15px; ",
+                                }))
+                                        <a href="#" class="k-icon k-i-checkmark"
+                                           id="verify-checkmark" style="display:none;color: white;border-radius: 50%;background-color: #6cce0e;position: absolute;top: 7px;right: -25px;font-size: 12px;">
+                                            &nbsp;
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        @*</span>*@
+                                        @*@(Html.Kendo().Button().Name("very").Content("Verify")
+                                         .Events(ev => ev.Click("btnVerifyClick"))
+                                        .HtmlAttributes(new
+                                        {
+                                            type = "submit",
+                                            style = "margin-left: 19px;width: 55px;height:29px;"
+                                        }))*@
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            @*<div class="clear-fix" style="clear:both"></div>*@
+                            @*Verification for Email*@
+
+                            <div class="row" id="VerificationDiv" style="display:none;padding-right: 0;">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6" style="padding:0px;">
+                                            @(Html.Kendo().TextBox().Name("txtVerifyEmailOTP").HtmlAttributes(new
+                                    {
+                                        placeholder = "Enter OTP",
+                                        maxlength = "4",
+                                        style = "width:100%;"
+                                    }))
+                                        </div>
+                                        <div class="col-md-3 " style="padding:0px;">
+                                            @(Html.Kendo().Button().Name("btnVerifyMail")
+                                    .Content("Submit")
+                                     //.Events(ev => ev.Click("btnVerifyOtpClick"))
+                                     .Events(ev => ev.Click("btnVerifyMail_Click"))
+                                    .HtmlAttributes(new
+                                    {
+                                        type = "button",
+                                        @class = "k-primary",
+                                        style = "width:60px;margin: 0px 5px;font-size: 11px;color: white;;border: 1px #1d2d3eeb;height: 2.7em;"
+                                    }
+                                    ))
+                                        </div>
+                                        <div class="col-md-3" style="padding:0px;">
+                                            @(Html.Kendo().Button().Name("btnResendEmail")
+                                     .Content("Resend")
+                                    //.Enable(false)
+                                    .Events(ev => ev.Click("btnResendMailOTP_Click"))
+                                    .HtmlAttributes(new
+                                    {
+                                        type = "button",
+                                        @class = "k-primary",
+                                        style = "width:60px;margin: 0px 9px;font-size: 11px;color: white;border: 1px #1d2d3eeb;height: 2.7em; "
+                                    }
+                                    ))
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <label id="OTPBlank" style="display:none;">Enter OTP</label>
+                        <label id="OTPInvalid" style="display:none;">Invalid OTP</label>
+                        <label id="OTPExpire" style="display:none;">OTP Expired</label>
+                        <div class="clear-fix" style="padding:1px;"></div>
+
+
+                        <div class="clear-fix" style="padding:1px;"></div>
+                        @*<div class="form-group">
+                            <div class="col-md-3" style="padding-left: 0px;">
+                                Enter Code
+                            </div>
+                            <div class="col-md-5">
+                                @(Html.Kendo().TextBox().Name("txtName").HtmlAttributes(new { required = "required", validationmessage = "Enter code", style = "width: 250px;" }))
+
+                            </div>
+                        </div>*@
+                        <div class="clear-fix" style="padding:2px;"></div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="padding-left: 0px;font-size: 12px;font-family: sans-serif;margin-top: 6px;">
+                                Old Password
+                            </div>
+                            <div class="col-md-5">
+                                @(Html.Kendo().TextBox().Name("txtcurrentpassword")
+
+                             .HtmlAttributes(new
+                             {
+                                 required = "required",
+                                 validationmessage = "Enter Your Old Password",
+                                 placeholder = "**********",
+                                 type = "password",
+                                 style = "width:250px;",
+                                 onchange = " return onOldPswChange();",
+
+                             }
+                              ))
+                                <label id="pswmatch" style="color:red;font-size:10px; display:none">Password does not exist</label>
+                            </div>
+                        </div>
+                        <div class="clear-fix" style="padding:2px;"></div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="padding-left: 0px;font-size: 12px;font-family: sans-serif;padding-right:0;margin-top: 6px;">
+                                New Password
+                            </div>
+                            <div class="col-md-5">
+                                @(Html.Kendo().TextBox().Name("txtpassword").HtmlAttributes(new
+                        {
+                            required = "required",
+                            validationmessage = "Enter Your New Password",
+                            placeholder = "**********",
+                            type = "password",
+                            style = "width:250px;",
+                            tabindex = "1",
+                            onblur = " return ontxtPwdchangeevent();",
+                            //onkeypress = "return passwordonly(event)"
+                            onkeyup = "return passwordonly(event)"
+                        }))
+                            </div>
+                        </div>
+                        <style>
+                            .row1 label {
+                                font-weight: 500;
+                            }
+                        </style>
+                        <div class="row1" style="font-size:10px;padding-top: 15px;margin-left: 105px;display:none;">
+
+                            <div class="g-right">
+                                <img id="chk1" src="~/images/green.png" style="width:5%;" />
+                                <label style="font-size: 10px;font-family: sans-serif;color: gray;">8 or more character</label>
+                            </div>
+                            <div class="g-right">
+                                <img id="chk2" src="~/images/green.png" style="width:5%;" />
+                                <label style="font-size: 10px;font-family: sans-serif;color: gray;">at least 1 uppercase</label>
+                            </div>
+                            <div class="g-right">
+                                <img id="chk3" src="~/images/green.png" style="width:5%;" />
+                                <label style="font-size: 10px;font-family: sans-serif;color: gray;">at least 1 lowercase</label>
+                            </div>
+                            <div class="g-right">
+                                <img id="chk4" src="~/images/green.png" style="width:5%;" />
+                                <label style="font-size: 10px;font-family: sans-serif;color: gray;">at least 1 number</label>
+                            </div>
+                            <div class="g-right">
+                                <img id="chk5" src="~/images/green.png" style="width:5%;" />
+                                <label style="font-size: 10px;font-family: sans-serif;color: gray;">at least 1 Symbol</label>
+                            </div>
+
+                        </div>
+                        <div class="clear-fix" style="padding:2px;"></div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="padding-left: 0px;font-size: 12px;font-family: sans-serif;padding-right: 0;width: 28%;margin-top:6px;">
+                                Confirm Password
+                            </div>
+                            <div class="col-md-5" style="width: 40%;padding-left: 5px;">
+                                @(Html.Kendo().TextBox().Name("txtconfirmpassword").HtmlAttributes(new { required = "required", validationmessage = "Enter Your New Password", placeholder = "New Password", type = "password", tabindex = "1", style = "width:250px;" }))
+                            </div>
+
+                        </div>
+                        <label id="lblCompirePwdErrorMsg" style="color:red;font-size:10px; display:none;margin-top: 15px;margin-left: -138px;">Password does not match</label>
+                        <div class="col-md-10" style="margin-top: 5px;margin-left: 90px;">
+                            @*<div class="col-md-3" style="margin-left: 25px">*@
+
+
+                            @*</div>*@
+                            <div style="display: flex;">
+                                <input type="checkbox" id="terminateLogin" style="width: 14px;height: 14px;margin-left: 2px;">
+                                <span style="margin-top: 3px;margin-left: 3px;font-size: 11px;font-family: sans-serif;color: gray;">Terminate all active web browser sessions</span>
+                            </div>
+                        </div>
+                        <div class="clear-fix" style="padding:40px;"></div>
+                        <div class="row">
+                            @(Html.Kendo().Button().Name("Next12").Content("Reset Password").Events(ev => ev.Click("btnResetPswClick")).HtmlAttributes(new
+                        {
+                            type = "submit",
+                            style = "width: 104px;font-size: 11px;font-family:sans-serif;height: 30px;background: #0078d7;border:1px solid #088dc1;padding: 0;color: white;"
+                        }))
+                        </div>
+
+                        @*<div class="col-md-5" style="padding-top:10px;padding-left: 50px;margin-top: -35px;">*@
+
+                        @*</div>*@
+                    </div>
+                    @*<div class="clear-fix" style="padding:5px;"></div>
+                    <div class="row" style="padding-top:10px;padding-bottom:10px">
+                        <div class="col-md-7" style="margin-left: -18px;">
+                            <img src="~/Images/DPUserProfile/CaptureQuestion.PNG" style="height: 33px; width: 33px;" /><span style="font-size:17px;display:-webkit-inline-box"><b> Security Question</b></span>
+                        </div>
+                        <div class="col-md-3" style="margin-top: 5px;margin-left: 76px;">
+                            <img src="~/Images/DPUserProfile/086249-rounded-glossy-black-icon-business-diskette4.png" style="height: 25px; width: 27px;padding-left: 2px;" /><span style="color:rgb(126, 167, 1);">Save</span>
+                            @*<a href="#" style="color: #70cb72; /* cursor: auto; */ text-decoration: none; text-decoration: none !important;" id="btnsave">Save</a>
+                        </div>
+                    </div>
+                    <div class="aligncenter" style="height:0;border-top:1px groove ;font-size:0;margin-left: 15px;">-</div>
+                    <div style="padding-top:20px;font-size:small;color:gray;padding-left:15px;">
+                        Add a security question to protect your account
+                    </div>
+                    <div class="row" style="padding-top:25px;font-size:13px">
+                        <div class="col-md-3" style="padding-left: 0px;">
+                            Current Password
+                        </div>
+                        <div class="col-md-5">
+
+                            @(Html.Kendo().TextBox().Name("txtcurrent").HtmlAttributes(new
+                        {
+                            placeholder = "*********",
+                            type = "password",
+                            style = "width:250px;",
+                            value = @Session["Password"],
+                        }))
+
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top:5px;font-size:13px">
+                        <div class="col-md-3" style="padding-left: 0px;">
+                            Security Question
+                        </div>
+                        <div class="col-md-5">
+
+                            @(Html.Kendo().TextBox().Name("txtSec").HtmlAttributes(new
+                        {
+                            placeholder = "Enter your security question",
+                            //type = "password",
+                            style = "width:250px;",
+                            value = @Session["qes"]
+                        }))
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top:5px;font-size:13px">
+                        <div class="col-md-3" style="padding-left: 0px;">
+                            Answer
+                        </div>
+                        <div class="col-md-5">
+                            @(Html.Kendo().TextBox().Name("txtAns").HtmlAttributes(new
+                        {
+                            placeholder = " ",
+                            style = "width:250px;",
+                            value = @Session["ans"]
+
+                        }))
+                            <span title="Click here to show/hide password" class="add-on input-group-addon" style="cursor: pointer;border:none;"><a href="#" id="tgl" class="k-icon  k-i-eye" style="margin-top: -54px;margin-left: 210px;border:none;"></a></span>
+                            @*<input type="password" id="password" name="txtAns" value="@Session["ans"]" class="form-control" style="" data-toggle="password">
+                        </div>
+                    </div>*@
+
+                </div>
+
+            </div>
+
+        </div>
+
+    <div class="clearfix" style="margin-bottom:10px"></div>
+    </div>
+</div>
+    <style>
+        .verify-txt {
+            display: inline-block;
+            background: #337ab7;
+            /*border-radius: 6px;*/
+            color: #fff;
+            /*padding: 4px;*/
+            width: 34px;
+            text-align: center;
+            /*margin: 1px 202px;*/
+            text-decoration: none;
+            /*font-size: 11px;*/
+            height: 20px;
+            /*margin-top: 5px;*/
+        }
+
+            .verify-txt:hover, .verify-txt:focus {
+                text-decoration: none;
+                color: #fff;
+            }
+
+        .reset-txt {
+            display: inline-block;
+            background: rgb(126, 167, 1);
+            color: #fff;
+            padding: 4px;
+            width: 114px;
+            text-align: center;
+            margin: 1px 8px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+    </style>
+    <script>
+        function openchangepswddiv() {
+            debugger
+            var divv = document.getElementById('Changepasswordlanding');
+            divv.style.display = "block";
+            $("#txtEmail").attr("readonly", true);
+            var regId = $('#test1').data('text');
+            // Next12
+            $("#Next12").kendoButton().data("kendoButton").enable(false);
+            $("#ember1033").hide();
+            //alert("gbhj");
+            $.ajax({
+                type: "Get",
+                url: "/UserLanding/Landing/GetUserPhotoByUserRegId",
+                data: { 'regId': regId },
+                datatype: "json",
+                cache: false,
+                success: function (userdata) {
+
+                    if (userdata != null) {
+                        $("#proimg").attr("src", userdata.Uplaod_ImageURL);
+                        $("#usname").text(userdata.FullName);
+                        $("#txtEmail").val(userdata.User_EmailId);
+
+                    }
+
+                }
+
+            });
+        }
+
+        function Changepasswordlandingclose() {
+            var divv = document.getElementById('Changepasswordlanding');
+            divv.style.display = "none";
+        }
+        function btnVerifyClick() {
+
+            var EmailId = $("#txtEmail").val();
+
+            $("#btnResend").kendoButton({
+                enable: false,
+            });
+            var Resend = document.getElementById('btnResend');
+            Resend.style.backgroundColor = '#c9cdd1';
+
+            $("#VerificationDiv").show();
+            $.ajax({
+                type: "POST",
+                url: "/UserSignup/Signup/MailSend",
+                data: { 'toEmail': EmailId },
+                datatype: "json",
+                cache: false,
+                success: function (result) {
+                },
+                error: function (result) {
+                }
+            })
+        }
+
+        function btnVerifyOtpClick() {
+            var EmailId = $("#txtEmail").val();
+            var OTP = $("#txtVerifyEmailOTP").val();
+            $.ajax({
+                type: "POST",
+                url: "/UserSignup/Signup/OTPVerificationEmail",
+                data: { 'OTP': OTP, 'EmailId': EmailId },
+                datatype: "json",
+                cache: false,
+                success: function (result) {
+                    if (result == 1) {
+
+                    }
+                }
+            });
+        }
+
+
+        ////-----------Email validations function
+        function validateEmail(EmailId) {
+            //var EmailId = document.getElementById("txtEmail");
+            var EmailId = $("#txtEmail").val();
+            var regex = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+            if (regex.test(EmailId)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+        function onOldPswChange() {
+            debugger;
+            var emailId = $('#txtEmail').val();
+            var oldPassword = $('#txtcurrentpassword').val();
+            $.ajax({
+                type: "POST",
+                url: "/CustomizedLogin/Login/CheckOldPassword",
+                data: { 'emailId': emailId, 'oldPassword': oldPassword },
+                datatype: "json",
+                cache: false,
+                success: function (userdata) {
+                    debugger;
+                    if (userdata == 1) {
+                        $('#pswmatch').hide();
+                        if ($('#txtconfirmpassword').val() != "" && $('#txtpassword').val() != "" && ($('#txtconfirmpassword').val() == $('#txtpassword').val()) && $(".row1").is(":hidden")) {
+                            $("#Next12").kendoButton().data("kendoButton").enable(true);
+                        }
+                    }
+                    else {
+                        $('#pswmatch').show();
+
+                        $("#Next12").kendoButton().data("kendoButton").enable(false);
+                        return false;
+                    }
+                }
+            });
+        }
+
+        function passwordonly() {
+            debugger;
+            var txtPassword = document.getElementById("txtpassword");
+            $('.row1').css('display', 'block');
+            var lowerCaseLetters = /[a-z]/g;
+            var upperCaseLetters = /[A-Z]/g;
+            var numbers = /[0-9]/g;
+            var symbols = /[ !@@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+            if (txtPassword == "") {
+                $('.row1').css('display', 'none');
+            }
+            if (txtPassword.value.match(lowerCaseLetters)) {
+                $("#chk3").show();
+            }
+            if (txtPassword.value.match(upperCaseLetters)) {
+                $("#chk2").show();
+            }
+            if (txtPassword.value.match(numbers)) {
+                $("#chk4").show();
+            }
+            if (txtPassword.value.match(symbols)) {
+                $("#chk5").show();
+            }
+            if (txtPassword.value.length >= 8) {
+                $("#chk1").show();
+            }
+            if (txtPassword.value.match(lowerCaseLetters) && txtPassword.value.match(upperCaseLetters) && txtPassword.value.match(numbers) && txtPassword.value.match(symbols) && txtPassword.value.length >= 8) {
+                $('.row1').css('display', 'none');
+            }
+
+            if (event.keyCode == 8) {
+                debugger;
+                if (txtPassword.value.match(lowerCaseLetters)) {
+                    $("#chk3").show();
+                }
+                else
+                    $("#chk3").hide();
+
+                if (txtPassword.value.match(upperCaseLetters)) {
+                    $("#chk2").show();
+                }
+                else
+                    $("#chk2").hide();
+
+                if (txtPassword.value.match(numbers)) {
+                    $("#chk4").show();
+                }
+                else
+                    $("#chk4").hide();
+
+                if (txtPassword.value.match(symbols)) {
+                    $("#chk5").show();
+                }
+                else
+                    $("#chk5").hide();
+
+                if (txtPassword.value.length >= 8) {
+                    $("#chk1").show();
+                }
+                else
+                    $("#chk1").hide();
+
+            }
+        };
+
+        function ontxtPwdchangeevent() {
+
+            if ($('#txtconfirmpassword').val() != "" && $('#txtpassword').val() != "" && ($('#txtconfirmpassword').val() != $('#txtpassword').val())) {
+                $("#lblCompirePwdErrorMsg").show();
+            }
+            else {
+                $("#lblCompirePwdErrorMsg").hide();
+            }
+            if ($('#txtconfirmpassword').val() == "" || $('#txtpassword').val() == "" || ($('#txtconfirmpassword').val() != $('#txtpassword').val()) || $(".row1").is(":visible")) {
+
+                $("#Next12").kendoButton().data("kendoButton").enable(false);
+            }
+            else {
+                $("#Next12").kendoButton().data("kendoButton").enable(true);
+            }
+        }
+
+        $('#txtconfirmpassword').change(function () {
+            debugger;
+
+            if ($('#txtconfirmpassword').val() == "" || $('#txtpassword').val() == "") {
+                alert("Enter New Password");
+                $("#Next12").kendoButton().data("kendoButton").enable(false);
+                return false;
+                // document.getElementById('errormsg').innerText = '';
+            }
+            else if ($('#txtconfirmpassword').val() != $('#txtpassword').val() && $('#txtpassword').val() != "") {
+                // document.getElementById('errormsg').innerText = 'Password Not Matched';
+                //$("#imgverify").hide();
+                $("#lblCompirePwdErrorMsg").show();
+                $("#Next12").kendoButton().data("kendoButton").enable(false);
+                return false;
+                //alert("Password And Confirm Password Does Not Match");
+            }
+            else {
+                $("#lblCompirePwdErrorMsg").hide();
+                //$("#Next12").kendoButton().data("kendoButton").enable(true);
+            }
+            if ($('#txtconfirmpassword').val() == "" || $('#txtpassword').val() == "" || $('#pswmatch').is(":visible") || $(".row1").is(":visible")) {
+                debugger;
+                $("#Next12").kendoButton().data("kendoButton").enable(false);
+                return false;
+            }
+            else {
+                $("#Next12").kendoButton().data("kendoButton").enable(true);
+            }
+        })
+
+
+        function btnResetPswClick() {
+
+            debugger;
+            var password = $('#txtpassword').val();
+            var emailId = $('#txtEmail').val();
+            $.ajax({
+                type: "POST",
+                url: "/CustomizedLogin/Login/UpdatePassword",
+                data: { 'emailId': emailId, 'password': password },
+                datatype: "json",
+                cache: false,
+                success: function (result) {
+                    debugger;
+                    if (result == 1) {
+                        if ($("#terminateLogin").prop("checked") == true) {
+
+                            document.location = '@Url.Action("LogoutForResetPwd", "UserList", new {area = "ClientAdmin" })';
+                        }
+                        else {
+                            Changepasswordlandingclose();
+                        }
+
+                    }
+                    else {
+
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+
+
+    </script>
+    @*change password end*@
+    @*Mail Verification CSS and script function Start*@
+    <style>
+        #OTPInvalid, #OTPExpire, #OTPBlank {
+            margin-left: 107px;
+            color: #ab1111;
+            font-weight: normal;
+            font-size: 11px;
+        }
+    </style>
+    <script>
+
+        function SubmitDisableEmail() {
+            $("#btnVerifyMail").kendoButton({
+                enable: false,
+            });
+            var Submit = document.getElementById('btnVerifyMail');
+            Submit.style.backgroundColor = '#c9cdd1';
+
+        }
+        function SubmitEnableEmail() {
+            var y = document.getElementById('btnVerifyMail');
+            y.style.backgroundColor = '#8ebc00';
+            $("#btnVerifyMail").addClass(".k-primary k-button k-state-enabled").attr("disabled", false);
+            document.getElementById("btnVerifyMail").setAttribute("class", ".k-primary k-button k-state-enabled");
+        }
+        function ResendDisableEmail() {
+            $("#btnResendEmail").kendoButton({
+                enable: false,
+            });
+            var Resend = document.getElementById('btnResendEmail');
+            Resend.style.backgroundColor = '#c9cdd1';
+        }
+        function ResendEnableEmail() {
+            var z = document.getElementById('btnResendEmail');
+            z.style.backgroundColor = '#8ebc00';
+            $("#btnResendEmail").addClass(".k-primary k-button k-state-enabled").attr("disabled", false);
+            document.getElementById("btnResendEmail").setAttribute("class", ".k-primary k-button k-state-enabled");
+        }
+        function VerifyDisableEmail() {
+            $("#btnMailSendOTP").kendoButton({
+                enable: false,
+            });
+            var MailVerify = document.getElementById('btnMailSendOTP');
+            MailVerify.style.backgroundColor = '#c9cdd1';
+        }
+        function VerifyEnableEmail() {
+            var Verify = document.getElementById('btnMailSendOTP');
+            Verify.style.backgroundColor = '#8ebc00';
+            $("#btnMailSendOTP").addClass(".k-primary k-button k-state-enabled").attr("disabled", false);
+            document.getElementById("btnMailSendOTP").setAttribute("class", ".k-primary k-button k-state-enabled");
+        }
+
+
+        function DisableEnableResendEmail() {
+
+
+            if ($("#VerificationDiv").is(":hidden")) {
+                $("#OTPBlank").hide();
+                $("#OTPInvalid").hide();
+                $("#OTPExpire").hide();
+            } else if ($("#VerificationDiv").is(":visible")) {
+                $("#OTPInvalid").hide();
+                $("#OTPBlank").hide();
+                $("#OTPExpire").show();
+            }
+            //Enable Resend
+            ResendEnableEmail();
+            //Disable Submit
+            SubmitDisableEmail();
+
+
+        }
+
+        function DisableEnableSubmitResendEmail() {
+
+            if ($("#VerificationDiv").is(":hidden")) {
+                $("#OTPBlank").hide();
+                $("#OTPInvalid").hide();
+                $("#OTPExpire").hide();
+            } else if ($("#VerificationDiv").is(":visible")) {
+                $("#OTPInvalid").hide();
+                $("#OTPBlank").hide();
+                $("#OTPExpire").show();
+            }
+
+
+            //Disable submit
+            SubmitDisableEmail();
+
+            //Enable resend
+            ResendEnableEmail();
+
+            // return false;
+
+        }
+
+        function EmailsubmitResendActiveOperation() {
+
+            var EmailOTP = document.getElementById("txtVerifyEmailOTP");
+
+            //OTP Paste Event in txtVerifyEmailOTP
+            $("#txtVerifyEmailOTP").bind("paste", function (e) {
+                var pastedData = e.originalEvent.clipboardData.getData('text');
+                var len = pastedData.length;
+
+            });
+
+            //OTP Click Event in txtVerifyEmailOTP
+            EmailOTP.onkeypress = function () {    //Onkey press event on otptext box
+                debugger;
+            }
+
+            //Set Timeout Event in txtVerifyEmailOTP
+            setTimeout(DisableEnableResendEmail, 120000);
+        }
+
+        //-----OTP Sending functionality for Email and disable mail-send btn
+
+
+
+        //-----OTP verification functionality for Email
+        function btnVerifyMail_Click() {
+
+            var EmailId = $("#txtEmail").val();
+            var OTP = $("#txtVerifyEmailOTP").val();
+            if (OTP == "") {
+                $("#OTPBlank").show();
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/UserSignup/Signup/OTPVerificationEmail",
+                data: { 'OTP': OTP, 'EmailId': EmailId },
+                datatype: "json",
+                cache: false,
+                success: function (result) {
+                    if (result == 1) {
+                        //$("#maildiv").height(25);
+                        $("#VerificationDiv").hide();
+                        $("#verify-checkmark").show();
+                        $("#OTPInvalid").hide();
+                        $("#OTPExpire").hide();
+                        $("#OTPBlank").hide();
+                        document.getElementById("txtVerifyEmailOTP").value = "";
+                        $("#txtEmail").prop("disabled", true).addClass("k-state-disabled");
+
+
+                    }
+                    else if (result == 2) {
+                        $("#OTPBlank").hide();
+                        $("#OTPExpire").hide();
+                        $("#OTPInvalid").show();
+                    }
+                    else if (result == 3) {
+                        $("#OTPBlank").hide();
+                        $("#OTPInvalid").hide();
+                        $("#OTPExpire").show();
+
+                        //Disable submit
+                        SubmitDisableEmail();
+                        //Enable resend
+                        ResendEnableEmail();
+                    }
+                    else {
+                        alert("Something wrong on OTP");
+                    }
+                },
+                error: function (result) {
+                }
+            })
+        }
+
+        //-----OTP ReSending functionality for Email
+        function btnResendMailOTP_Click() {
+
+            document.getElementById("txtVerifyEmailOTP").value = "";
+            $("#OTPBlank").hide();
+            $("#OTPExpire").hide();
+            $("#OTPInvalid").hide();
+
+
+            //Disable Resend
+            ResendDisableEmail();
+
+            // Again otp is sending to that email
+            $.ajax({
+                type: "POST",
+                url: "/UserSignup/Signup/MailSend",
+                data: { toEmail: $('#txtEmail').val() },
+                datatype: "json",
+                cache: false,
+                success: function (result) {
+                },
+                error: function (result) {
+                }
+            })
+            ///End Ajax call
+
+            //Enable submit
+            SubmitEnableEmail();
+
+            EmailsubmitResendActiveOperation();
+
+        }
+
+
+    </script>
+    @*Mail Verification css and Script function End*@
+
+    @*madhu FeedBack Start*@
+    <style>
+        #Feedback .aliceblue-bg {
+            background: #3689d0;
+        }
+
+        .userpopupclass {
+            background-color: #3689d0;
+            height: 45px;
+            line-height: 3em;
+            width: 380px;
+        }
+
+        #Feedback .userClose {
+            background: #3689d0;
+        }
+
+        .userClose {
+            cursor: pointer;
+            text-align: left;
+            float: right;
+            line-height: 21px;
+            color: white;
+            margin-right: 15px;
+            margin-top: 6PX;
+        }
+
+        .grp-round span {
+            background: #fff;
+            padding: 0px 9px;
+            border-radius: 30px;
+            border: 1px solid #6d6d6d;
+            font-size: 16px;
+            font-weight: 600;
+            float: left;
+            margin-right: 5px;
+        }
+    </style>
+    <div id="FeedBacklanding" class="flyout-sm  flyout ember-view popup-styl2" style="display:none;">
+        <div class="modal-content modal-css">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 popup-topbar" style="">
+                    <div class="row main">
+                        <span class="popup-round1">NF</span>
+                        <h4 style="">Feedback</h4>
+                        <span onclick="FeedbackClose()" class="updatePaymentDetailsclose click2close" style="">&times;</span>
+                    </div>
+                </div>
+            </div>
+
+            @*<span onclick="FeedBacklandingclose()" style="cursor:pointer;text-align:left;float: right;font-size:10px; line-height:21px; color:black;">
+                    &#10006;
+                </span>*@
+            <div class="col-md-12 popup-body">
+                <div class="row">
+                    <div class="col-md-3 for-padding-zero">
+                        <img alt="ss" src="" width="56" height="54" style="border-radius:30px;" id="proimgg">
+                    </div>
+                    <div class="col-md-9 for-padding-zero" style="margin-left:-17px;">
+                        <span style="font-size:14px;color: cornflowerblue;" id="username"></span><br />
+                        @(Html.Kendo().Button()
+        .Name("primaryTextButton1")
+        .HtmlAttributes(new { type = "button", @class = "k-primary", style = "height:21px;width:83px;font-size: 9px;line-height: 1px;margin-top: 4px;margin-left:0px;" })
+        .Content("AVAILABLE ")
+                        //.Events(ev => ev.Click("Sndmail"))
+                        )
+                        @*<span style="font-family:Calibri;font-size:12px;color:grey;margin-left: 5px;" id="RegistrationnCode"></span>*@
+                    </div>
+                </div>
+                <div class="row"style="border-bottom: 1px solid #ccc;">
+                    @(Html.Label("Help us to improve KENCLOUD"))
+               </div>
+                <div class="row">
+                    @(Html.Label("Rate your experience with admin center"))
+                </div>
+               
+                <div style="line-height: 10px;">
+                    @*<span><i class="fa fa-star-half-o fa_custom"onclick="myfunction()"></i></span>
+                        <span><i class="fa fa-star-half-o fa_custom"></i></span>
+                        <span><i class="fa fa-star-half-o fa_custom"></i></span>
+                        <span><i class="fa fa-star-half-o fa_custom"></i></span>
+                        <span><i class="fa fa-star-half-o fa_custom"></i></span>*@
+                    <div class="star-rating"><s><s><s><s><s></s></s></s></s></s></div>
+                    @*<div class="star-rating-rtl"><s><s><s><s><s></s></s></s></s></s></div>*@
+
+                    <div class="show-result">No stars selected yet.</div>
+
+
+                </div>
+                <div class="row" style="border-bottom: 1px solid #ccc;">
+                    @(Html.Label("Enter your valuable feedback here"))
+                </div>
+                <div class="row">
+                @Html.TextArea("txtfeedback", "", new
+           {
+               @class = "k-textbox",
+               required = "",
+               validationmessage = "Enter FeedBack",
+               tabindex = "4",
+               style = "width: 100%;height: 84px;    font-style: normal;",
+               placeholder = "Enter FeedBack"
+
+           })
+                    @*@(Html.Kendo().TextBox()
+                                        .Name("txtfeedback")
+                                        .HtmlAttributes(new
+                                        {
+                                            placeholder = "",
+                                            required = "required",
+                                            validationmessage = "*",
+                                            maxlength = "50",
+                                            style = "height: 101px; width:353px;font-family:Calibri;font-size:12px;margin-left: 23px;font-style: italic;border-radius: 0px;",
+                                            @class = "form-control col-xs-2"
+                                        })
+
+                        )*@
+                </div>
+
+
+                <div class="row" >
+                    <div class="col-md-1 for-padding-zero"style="padding-left: 4px;"><input type="checkbox" style="" class="chkdet" id="" value="" checked /></div>
+                    <div class="col-md-8" style="padding:0;"><span>Contact me about this feedback</span></div>
+                </div>
+
+                <div class="row">
+                    @(Html.Kendo().TextBox()
+                            .Name("txttEmail")
+                            .Enable(false)
+                            .HtmlAttributes(new
+                            {
+                                // placeholder = "daniel.r@kencloud.co.in",
+                                required = "required",
+                                validationmessage = "*",
+                                maxlength = "50",
+                                style = "width:100%;background:#eee;",
+                                @class = ""
+                            })
+
+                    )
+                </div>
+
+                <div style="line-height: 3px;margin-top: 181px;">
+
+                    <span>
+                        @(Html.Kendo().Button()
+                    .Name("request")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary add-btn-prod", style = "" })
+                     .Content("Submit")
+
+            .Events(e => e.Click("savebtnn"))
+                        )
+                    </span><span style="margin-left: 35px;">
+                        @(Html.Kendo().Button()
+                    .Name("cancelbtnn")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary cancel-btn-prod", style = "display:none" })
+                  .Content("Cancel")
+
+                .Events(e => e.Click("FeedbackClose"))
+                        )
+                    </span>
+
+
+
+
+
+
+
+                </div>
+
+
+
+            </div>
+
+            <div class="clearfix" style="margin-bottom:10px"></div>
+        </div>
+        </div>
+        <script>
+            function openchangefeeddiv() {
+                debugger;
+                var divv1 = document.getElementById('FeedBacklanding');
+                divv1.style.display = "block";
+                $("#ember1033").hide();
+
+                $("#txtfeedback").val("");
+                $("#username").val("");
+                $("#txttEmail").val("");
+                $("#RegistrationCode").val("");
+
+                $.ajax({
+                    type: "GET",
+                    url: "/ClientAdmin/ClientDashBoard/GetUserPhotoByUserRegId",
+                    datatype: "json",
+                    cache: false,
+                    success: function (data) {
+                        debugger
+
+                        document.getElementById("username").innerHTML = data[0].User_DisplayName;
+                        document.getElementById("txttEmail").value = data[0].User_EmailId;
+                        //  document.getElementById("RegistrationnCode").innerHTML = data[0].User_Unique_RegistrationCode;
+                        $("#proimgg").attr("src", data[0].Uplaod_ImageURL);
+
+                    }
+
+
+
+                });
+            }
+
+
+            function FeedbackClose() {
+                var divv1 = document.getElementById('FeedBacklanding');
+                divv1.style.display = "none";
+            }
+        </script>
+        <script>
+            //function canlbtnn() {
+            //    var reset = document.getElementById("FeedBacklanding");
+            //    reset.style.display = "none";
+            //}
+
+
+        </script>
+    on cliking anywhere in body close topbar dropdown in mvc
+
+    
+        <script>
+            var numStars;
+            $(function () {
+                $("div.star-rating > s, div.star-rating-rtl > s").on("click", function (e) {
+
+                    // remove all active classes first, needed if user clicks multiple times
+                    $(this).closest('div').find('.active').removeClass('active');
+
+                    $(e.target).parentsUntil("div").addClass('active'); // all elements up from the clicked one excluding self
+                    $(e.target).addClass('active');  // the element user has clicked on
+
+
+                    numStars = $(e.target).parentsUntil("div").length + 1;
+                    $('.show-result').text(numStars + (numStars == 1 ? " star" : " stars!"));
+                });
+            });
+
+            function savebtnn() {
+
+                var validator = $("#FeedBacklanding").kendoValidator().data("kendoValidator");
+
+                if (validator.validate()) {
+                    debugger;
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/ClientAdmin/ClientDashBoard/Savefeedback",
+                        data: {
+                            Rating: numStars,
+                            Text: $("#txtfeedback").val(),
+                        },
+                        datatype: "json",
+                        cache: false,
+                        success: function (result) {
+                            debugger;
+                            var reset = document.getElementById("FeedBacklanding");
+                            reset.style.display = "none";
+                        },
+                        error: function (result) {
+                        }
+                    })
+                }
+            }
+
+        </script>
+        <style>
+            .show-result {
+                padding: 10px;
+                color: green;
+                font-size: 10px;
+                margin-left: -4px;
+            }
+
+
+            .star-rating s.active {
+                color: yellow;
+            }
+
+            .star-rating-rtl s:hover,
+            .star-rating-rtl s.active {
+                color: yellow;
+            }
+
+            .star-rating s,
+            .star-rating-rtl s {
+                color: black;
+                font-size: 24px;
+                cursor: default;
+                text-decoration: none;
+            }
+
+            .star-rating {
+                padding: 2px;
+            }
+
+            .star-rating-rtl {
+                background: #555;
+                display: inline-block;
+                border: 2px solid #444;
+            }
+
+                .star-rating-rtl s {
+                    color: yellow;
+                }
+
+            .star-rating s:hover:before,
+            .star-rating s.rated:before,
+            .star-rating s.active:before {
+                content: "\2605";
+            }
+
+            .star-rating s:before {
+                content: "\2606";
+            }
+
+            .star-rating-rtl s:hover:after,
+            .star-rating-rtl s.rated:after,
+            .star-rating-rtl s.active:after {
+                content: "\2605";
+            }
+
+            .star-rating-rtl s:after {
+                content: "\2606";
+            }
+        </style>
+        <style>
+            .fa_custom {
+                color: gold;
+            }
+        </style>
+        <script>
+            function GropuAddClose() {
+                var reset = document.getElementById("FeedBacklanding");
+                reset.style.display = "none";
+            }
+        </script>
+
+
+
+
+
+        @*madhu FeedBackEnd*@
+
+        @* akan Setting start*@
+
+        <style>
+            #searchSetting {
+                height: 21px;
+            }
+        </style>
+        @* setting end*@
+
+
+        @*akan Service Request*@
+
+
+        <style>
+            .circle {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                color: black;
+                line-height: 500px;
+                text-align: center;
+                background-color: white;
+                margin-left: 30px;
+            }
+        </style>
+
+        <style>
+            .upload {
+                font-size: 10px;
+                font-family: calibri;
+                font-style: italic;
+                margin: 2px;
+            }
+
+            .row {
+                margin-left: 0px;
+                margin-right: 0px;
+            }
+
+            .k-upload-button {
+                margin: 0px !important;
+            }
+        </style>
+        @*Service Request End*@
+
+        @*Service Request Start*@
+        <style>
+                #newServiceRequest .k-invalid-msg {
+                    box-shadow: none;
+                    padding: 0px;
+                }
+
+                .popup-hd1 {
+                    font-size: 12px;
+                    color: #337ab7;
+                    padding-left: 0px;
+                    margin: 3px 0px;
+                    font-family: sans-serif;
+                }
+
+                .flyout.flyout-sm {
+                    width: 408px !important;
+                    position: fixed;
+                }
+
+                .popup-round {
+                    background: #fff;
+                    padding: 2px 7px;
+                    border-radius: 30px;
+                    border: 1px solid #6d6d6d;
+                    font-size: 14px;
+                    font-weight: 600;
+                    float: left;
+                    margin-right: 5px;
+                    height: 48px;
+                }
+
+                .popup-main {
+                    padding: 9px 0px 0px 17px;
+                }
+
+                    .popup-main h4 {
+                        font-size: 12px;
+                        color: #fff;
+                        margin: 5px 0px 0px 0px;
+                    }
+
+                .popup-top {
+                    background-color: #3c6bbf;
+                    height: 45px;
+                    line-height: 3em;
+                }
+
+                .flyout-sm .k-textbox::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+                    color: #ccc;
+                    font-style: italic;
+                }
+
+                .flyout-sm .k-textbox:-ms-input-placeholder { /* IE */
+                    color: #ccc;
+                    font-style: italic;
+                }
+                /*.flyout-sm .k-list-optionlabel{
+                color: #ccc;
+                font-style: italic;
+            }*/
+                .pop-up-btn {
+                    height: 26px;
+                    width: 27%;
+                    font-size: 12px;
+                    border: none;
+                }
+
+                #txtphn_validationMessage, #ddlcountry_validationMessage, #_validationMessage, #ddllservice_validationMessage, #dllservicearea_validationMessage, #ddllproblem_validationMessage, #txtissuee_validationMessage {
+                    font-size: 10px;
+                }
+
+                validationmessage {
+                    font-size: 10px;
+                }
+
+                .err-msg {
+                    color: red;
+                }
+
+                #txtphn_validationMessage {
+                       margin-left: 4px;
+                }
+        </style>
+        <div id="newServiceRequest" class="flyout-sm  flyout ember-view cssdivclose popup-styl2" style="display:none;">
+            <div class="modal-content modal-css">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 popup-topbar" style="">
+                        <div class="row main">
+                            <span class="popup-round1" style="padding: 10px 8px;">NSR</span>
+                            <h4 style="">New Service Request</h4>
+                            <span onclick="newServiceRequestclose()" class="updatePaymentDetailsclose click2close" style="">&times;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 popup-body">
+                    <div class="popup-hd1">Description</div>
+                    <div class="row">
+                        @(Html.Label(" Title"))<span class="err-msg">*</span>
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().TextBox()
+                    .Name("txtissuee")
+                    .HtmlAttributes(new
+                    {
+                        placeholder = "Enter the title",
+                        required = "required",
+                        validationmessage = "Enter Title",
+                        maxlength = "50",
+                        style = "width:100%;",
+                        @class = ""
+                    })
+                        )
+                    </div>
+                    <div class="row">
+                        @(Html.Label(" Service"))<span class="err-msg">*</span>
+                        <input type="hidden" id="servicename" name="user" value="0">
+                        <input type="hidden" id="serviceid" name="user" value="0">
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().DropDownList()
+                    .Name("ddllservice")
+
+                    .DataTextField("ServiceTypeName")
+                    .DataValueField("ServiceTypeId")
+                    //.DataSource(ds => ds.Read("Service", "ListPage"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("Service", "ListPage", new { area = "ClientSupport" });
+                        });
+                    })
+                    //.Events(ev => ev.Select("ExistServiceSelect"))
+                    .HtmlAttributes(new
+                    {
+                        required = "required",
+                        validationmessage = "Choose Service Type",
+                        placeholder = "Select",
+                        style = "width: 100%;",
+                    })
+                    .OptionLabel("Select")
+
+                        )
+
+                    </div>
+                    <div class="row">
+                        @(Html.Label(" Service Area"))<span class="err-msg">*</span>
+                        <input type="hidden" id="serviceAreaname" name="user" value="0">
+                        <input type="hidden" id="serviceAreaid" name="user" value="0">
+
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().DropDownList()
+                    .Name("dllservicearea")
+
+                    .DataTextField("ServiceAreaName")
+                    .DataValueField("ServiceAreaId")
+                    //.DataSource(ds => ds.Read("ServiceArea", "ListPage"))
+                    .OptionLabel("Select ServiceArea")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("ServiceArea", "ListPage", new { area = "ClientSupport" })
+                        .Data("filterByService");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("ddllservice")
+                    //.Events(ev => ev.Select("ExistServiceAreaSelect"))
+                    .HtmlAttributes(new
+                    {
+                        required = "required",
+                        validationmessage = "Choose Service area.",
+                        placeholder = "Select",
+
+                        style = "width: 100%;",
+
+                    })
+                    //.OptionLabel("Select")
+
+                        )
+                    </div>
+                    <script>
+                        function filterByService() {
+                            return {
+                                service: $("#ddllservice").val()
+                            };
+                        }
+                    </script>
+                    <div class="row">
+                        @(Html.Label("Problem"))<span class="err-msg">*</span>
+                        <input type="hidden" id="problemname" name="user" value="0">
+                        <input type="hidden" id="problemid" name="user" value="0">
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().DropDownList()
+                    .Name("ddllproblem")
+
+                    .DataTextField("ProblemName")
+                    .DataValueField("ProblemId")
+                    //.DataSource(ds => ds.Read("Problem", "ListPage"))
+                    .OptionLabel("Select Problem")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("Problem", "ListPage", new { area = "ClientSupport" })
+                        .Data("filterByServiceArea");
+                        })
+                        .ServerFiltering(true);
+                    })
+                    .Enable(false)
+                    .AutoBind(false)
+                    .CascadeFrom("dllservicearea")
+                    //.Events(ev => ev.Select("ExistProblemSelect"))
+                    .HtmlAttributes(new
+                    {
+                        placeholder = "Select",
+                        required = "required",
+                        validationmessage = "Choose Problem.",
+                        style = "width: 100%;",
+
+                    })
+                    //.OptionLabel("Select")
+
+                        )
+
+                    </div>
+                    <script>
+                        function filterByServiceArea() {
+                            return {
+                                serviceAreaId: $("#dllservicearea").val()
+                            };
+                        }
+                    </script>
+                    <div class="row">
+                        @(Html.Label(" Additional Notes"))<span class="err-msg">*</span>
+                    </div>
+                    <div class="row">
+                        @Html.TextArea("txtaddnote", "", new
+               {
+                   @class = "k-textbox",
+                   required = "",
+                   validationmessage = "Description required",
+                   placeholder = "Enter Notes",
+                   style = "width: 100%;height: 84px;",
+
+               })
+                    </div>
+                    <div class="popup-hd1">Contact Information</div>
+                    <div class="row">
+                        @(Html.Label("Name"))@*<span class="err-msg">*</span>*@
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().TextBox()
+                      .Name("txtname")
+                      .HtmlAttributes(new
+                      {
+                          placeholder = "",
+                          //required = "required",
+                          validationmessage = "Name is required",
+                          maxlength = "50",
+                          style = "width:100%;",
+                          @class = ""
+                      })
+                        )
+                    </div>
+                    <div class="row">
+                        @(Html.Label("Phone"))<span class="err-msg">*</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 for-padding" id="Mobile1-dropdown">
+                            @(Html.Kendo().DropDownList()
+                        .Name("MobilenoPrefix1")
+                        .DataTextField("Country_Code")
+                        .DataValueField("Country_Id")
+                        .OptionLabel("+00")
+                        .DataSource(ds => ds.Read("Country", "Signup", new { area = "UserSignup" }))
+                        .Events(e =>
+                        {
+                            e.Select("onSelectCountry_Code");
+                        })
+                        .HtmlAttributes(new
+                        {
+                            tabindex = "6",
+                            style = "width:100%;",
+                            @class = "mob-prefix"
+                        }))
+                        </div>
+                        <div class="col-md-10 for-padding-zero">
+                            @(Html.Kendo().TextBox().Name("txtphn").HtmlAttributes(new
+                    {
+                        required = "required",
+                        validationmessage = "Enter Mobile No",
+                        pattern = "\\d{10}",
+                        type = "tel",
+                        maxlength = "10",
+                        style = "width:99%;float: right;",
+                        @class = ""
+
+
+                    }))
+                        </div>
+                        <label id="txtphn_validationMessage1" style="display:none;">Enter a 10 digit mobile no</label>
+                    </div>
+                    <div class="row">
+                        @(Html.Label("Email"))@*<span class="err-msg">*</span>*@
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().TextBox()
+                    .Name("txtemail1")
+                    .HtmlAttributes(new
+                    {
+                        placeholder = "",
+                        //required = "required",
+                        validationmessage = "EmailId is required",
+                        maxlength = "50",
+                        style = "width:100%;",
+                        @class = ""
+                    })
+                        )
+                    </div>
+                    <div class="row">
+                        @(Html.Label("Country"))<span class="err-msg">*</span>
+                        <input type="hidden" id="countryname" name="user" value="0">
+                        <input type="hidden" id="countryid" name="user" value="0">
+                    </div>
+                    <div class="row">
+                        @(Html.Kendo().TextBox()
+                    .Name("ddlcountry")
+                    .HtmlAttributes(new
+                    { style = "width:100%;", required = "required", validationmessage = "Select Mobile Prefix to get Country" }))
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-4 for-padding-zero">
+                            @(Html.Kendo().Button()
+                    .Name("requestt")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary add-btn-prod", style = "" })
+                    .Content("Confirm")
+                    .Events(ev => ev.Click("confirm_clickForRequest"))
+                            )
+                        </div>
+                        <div class="col-md-4 for-padding-zero">
+                            @(Html.Kendo().Button()
+                    .Name("servcancel")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary cancel-btn-prod", style = "" })
+                    .Content("Cancel")
+                    //.Enable(false)
+                    .Events(e => e.Click("Cancel_click"))
+                            )
+                        </div>
+                    </div><br />
+                </div>
+            </div>
+        </div>
+        <script>
+
+
+            function openchangereqdiv() {
+                debugger;
+                $("#ember1033").hide();
+                openserviceRequest();
+
+            }
+            function openLockScreen() {
+                debugger;
+                document.location = '@Url.Action("GetLockScreen", "ClientDashBoard", new { area = "ClientAdmin" })';
+                @*$("#ember1033").hide();
+                $.removeCookie("CurrentUrl");
+                @*var url = '@Url.Action("Index","LockScreen", new { area = "ClientAdmin" })';*@
+                //var currenturl = window.location.href;
+                //$.cookie("CurrentUrl", currenturl);
+                //window.location.href = '/ClientAdmin/LockScreen/Index/';
+            }
+            function ServiceRequestlandingclose() {
+                var divv3 = document.getElementById('ServiceRequestlanding');
+                divv3.style.display = "none";
+            }
+
+           // $("#body").on('keydown', null, 'ctrl+l', openLockScreen());
+            $(document).ready(function () {
+                debugger;
+                //log("Ready. Press Ctrl+Shift+F9!");
+                var isCtrl;
+                var isShift;
+                // action on key up
+                $(document).keyup(function (e) {
+                    if (e.which == 17) {
+                        isCtrl = false;
+                    }
+                    if (e.which == 76 || e.which==108) {
+                        isShift = false;
+                    }
+                });
+                // action on key down
+                $(document).keydown(function (e) {
+                    if (e.which == 17) {
+                        isCtrl = true;
+                    }
+                    if (e.which == 76 || e.which == 108) {
+                        isShift = true;
+                    }
+                    if ( isCtrl && isShift) {
+                        openLockScreen();
+                    }
+                });
+
+            });
+            function onSelectCountry_Code(e) {
+                debugger;
+                var dataItem = this.dataItem(e.item);
+                var id = dataItem.Country_Id;
+                if (id == "") {
+                    $("#ddlcountry").val("");
+                    //$("#txtMobileNo").val("");
+                    // VerifyDisableMob();
+                    $("#txtphn").prop("disabled", true).addClass("k-state-disabled");
+                    $("#txtphn_validationMessage").hide();
+
+                }
+                else {
+                    //If country code value not 00 then
+                    $("#txtphn").prop("disabled", false).removeClass("k-state-disabled");
+                }
+
+
+                document.getElementById("countryid").value = dataItem.Country_Id;
+                //alert(dataItem.Country_Id);
+                $.ajax({
+                    type: "POST",
+                    url: "/Signup/CountryNameBind",
+                    data: { id: id },
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: "json",
+                    success: function (data) {
+                        $("#ddlcountry").val(data.Conuntry_Name);
+
+                    },
+                });
+            }
+
+            $('#txtphn').keypress(function (e) {
+                var regex = new RegExp("^[0-9]+$");
+                var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+                if (regex.test(str)) {
+                    return true;
+                }
+                e.preventDefault();
+                return false;
+            });
+        </script>
+
+
+
+        <div id="ServiceRequest" class="flyout-sm  flyout ember-view cssdivclose" style="display:none;overflow-y: scroll;font-family:Calibri;width:400px;">
+
+
+
+
+
+            <div class="flyout-side popup-top">
+                <span onclick="ServiceRequestclose()" class="userClose">
+                    &#10006;
+                </span>
+                <div class="row">
+                    <div class="main popup-main">
+                        <span class="popup-round" style="padding: 1px 15px;">SR</span>
+                        <h4>Support Id:<label style="font-size: 12px;font-weight: 400;" id="txtsid"></label></h4>
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+
+            <div class="clear-fix"></div>
+            <div class="user-pro">
+                <div class="row">
+                    <i class="fa fa-check-circle fa-2x" style="font-size: 1.1em;color: limegreen;margin-left: 14px;margin-top: 14px;"></i>
+                    @*<h6>Confirmation</h6>*@
+
+                    <span style="font-size:13px;color:black;">Confirmation</span>
+                </div>
+                <div class="clearfix" style="height:2px; clear:both"></div>
+                <div class="row"> <div class="col-md-12" style="font-size:13px"> Service request submitted successfully</div></div>
+                <div class="row"> <div class="col-md-12" style="font-size:12px">Response times vary based on your location and the severity of the issue.</div></div>
+                <div class="clearfix" style="height:2px; clear:both"></div>
+                @Html.Label("Support Id:", htmlAttributes: new { @class = "control-label", style = "font-size:13px;font-weight:600;margin: 3px 43px;" })
+                <label style="font-size: 12px;font-weight: 400;" id="txtsupportid"> </label>
+
+                <div class="clearfix" style="height:8px; clear:both"></div>
+                <div class="row" style="font-size:13px;color: black;">
+                    <div class="col-md-10" style="left:15px;">
+                        <div class="col-md-5">
+                            @Html.Label("Title", htmlAttributes: new { @class = "control-label", style = "font-size: 12px;font-weight: 400; " })
+                        </div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="txtissue11"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Service</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="ddlservice1"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Service area</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="dlservicearea"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Problem</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="ddlproblem"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Addtional Notes</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="txtaddnotee"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Contact Name</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="txtnamee"></label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Contact Phone</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="txtphnn"> </label></div>
+
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                        <div class="col-md-5">Email ID</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="txtemaill"> </label></div>
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+
+                        <div class="col-md-5">Country</div>
+                        <div class="col-md-7"><label style="font-size: 12px;font-weight: 400;" id="ddllcountry"> </label></div>
+                        <div class="clearfix" style="height:7px; clear:both"></div>
+                    </div>
+
+
+
+                    <div class="col-md-2"></div>
+
+                </div>
+
+
+
+
+
+            </div>
+            <div class="clearfix" style="height:10px; clear:both"></div>
+            <div style="margin-top:138px; margin-left:50px">
+
+                @(Html.Kendo().Button()
+.Name("confirmm")
+.HtmlAttributes(new { type = "button", @class = "k-primary", style = "height:26px;width:101px;background-color:cornflowerblue;margin-right: 0px;font-size: 12px;color:white;line-height: 9px;" })
+.Content("Finish")
+.Events(ev => ev.Click("finish_click"))
+                )
+
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+        <div class="clearfix" style="height:10px; clear:both"></div>
+        @*</div>*@
+
+
+
+
+        <script>
+
+          
+
+            function newServiceRequestclose() {
+                var divv3 = document.getElementById('newServiceRequest');
+                divv3.style.display = "none";
+            }
+
+            function ServiceRequestclose() {
+                var divv3 = document.getElementById('ServiceRequest');
+                divv3.style.display = "none";
+            }
+
+
+            function finish_click() {
+                var divv3 = document.getElementById('ServiceRequest');
+                divv3.style.display = "none";
+                var reset = document.getElementById("newServiceRequest");
+                reset.style.display = "none";
+            }
+
+            function Cancel_click() {
+                var divv3 = document.getElementById('newServiceRequest');
+                divv3.style.display = "none";
+
+            }
+
+        </script>
+
+
+        <script>
+            function confirm_clickForRequest() {
+                debugger;
+                var validator = $("#newServiceRequest").kendoValidator().data("kendoValidator");
+
+                if (validator.validate()) {
+                    var service = $("#ddllservice").data("kendoDropDownList");
+                    var serviceArea = $("#dllservicearea").data("kendoDropDownList");
+                    var problem = $("#ddllproblem").data("kendoDropDownList");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/ListPage/CreateSupport",
+                        data: {
+                            Title: $("#txtissuee").val(),
+                            Service: service.value(),
+                            ServiceArea: serviceArea.value(),
+                            Problem: problem.value(),
+                            AdditionalNote: $("#txtaddnote").val(),
+                            PersonName: $("#txtname").val(),
+                            PhoneNumber: $("#txtphn").val(),
+                            Email: $("#txtemail1").val(),
+                            Country: $("#countryid").val(),
+
+
+                        },
+                        datatype: "json",
+                        cache: false,
+
+                        success: function (result) {
+                            debugger;
+                            $("#newServiceRequest").hide();
+                            $("#ServiceRequest").show();
+                            //alert(result);
+                            //myFunction21();
+                            //window.location.reload();
+                            document.getElementById('txtaddnotee').innerHTML = $("#txtaddnote").val();
+                            document.getElementById('txtissue11').innerHTML = $("#txtissuee").val();
+                            document.getElementById('ddlservice1').innerHTML = service.text();
+                            document.getElementById('dlservicearea').innerHTML = serviceArea.text();
+                            document.getElementById('ddlproblem').innerHTML = problem.text();
+                            document.getElementById('txtnamee').innerHTML = $("#txtname").val();
+                            document.getElementById('txtphnn').innerHTML = $("#txtphn").val();
+                            document.getElementById('txtemaill').innerHTML = $("#txtemail1").val();
+                            document.getElementById('ddllcountry').innerHTML = $("#ddlcountry").val();
+                            document.getElementById('txtsupportid').innerHTML = result;
+                            document.getElementById('txtsid').innerHTML = result;
+
+                            var path = window.location.origin;
+                            path = path.replace(/\/$/, "");
+                            path = decodeURIComponent(path);
+                            totUrl = path + "/ClientSupport/ListPage/index";
+                            if (document.location == totUrl) {
+                                myFunction21();
+                            }
+
+                            @*@Html.Label("txtsupportid", (String)ViewBag.User_Unique_RegistrationCode)*@
+
+                        },
+                        error: function (result) {
+                            debugger;
+
+
+                        }
+                    })
+                }
+
+            }
+
+
+        </script>
+
+        <script>
+            function openserviceRequest() {
+                debugger;
+                var reset = document.getElementById("newServiceRequest");
+                reset.style.display = "block";
+                $("#txtissuee").val("");
+                $("#ddllservice").data("kendoDropDownList").value(-1);
+                $("#dllservicearea").data("kendoDropDownList").value(-1);
+                $("#ddllproblem").data("kendoDropDownList").value(-1);
+                $("#txtaddnote").val("");
+                $("#MobilenoPrefix1").data("kendoDropDownList").value(-1);
+                $("#txtphn").val("");
+                $("#ddlcountry").val("");
+                $("#txtname").prop("disabled", true).addClass("k-state-disabled");
+                $("#txtemail1").prop("disabled", true).addClass("k-state-disabled");
+
+                $("#txtphn_validationMessage").hide();
+                $("#ddlcountry_validationMessage").hide();
+                $("#_validationMessage").hide();
+                $("#ddllservice_validationMessage").hide();
+                $("#dllservicearea_validationMessage").hide();
+                $("#ddllproblem_validationMessage").hide();
+                $("#txtissuee_validationMessage").hide();
+                $.ajax({
+                    type: "POST",
+                    url: "/ClientSupport/ListPage/Autopopulate",
+                    // data: { 'id': id },
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    dataType: "json",
+                    success: function (data) {
+                        debugger;
+                        $("#newServiceRequest").show();
+                        $("#txtname").val(data.Data[0].FullName);
+                        $("#txtemail1").val(data.Data[0].User_EmailId);
+                    },
+                    error: function (data) {
+
+                    }
+                });
+
+            }
+        </script>
+        @*Service Request End*@
+        <style>
+            .k-widget {
+                border-color: white !important;
+            }
+
+            .k-i-warning {
+                display: none;
+            }
+
+            .k-widget.k-tooltip-validation {
+                background-color: white !important;
+                color: red !important;
+                /*font-size: 15px;*/
+            }
+
+            .new-servc-req .clearfix {
+                margin-bottom: 3px;
+            }
+
+            .for-padding {
+                padding: 0px;
+            }
+
+            #Mobile1-dropdown .k-dropdown-wrap {
+                height: 27px;
+            }
+
+            #Mobile-dropdown .k-dropdown-wrap {
+                border-width: 1px !important;
+                border-style: solid !important;
+                padding: 0 0 0 0 !important;
+            }
+        </style>
+
+        <script>
+
+            function Availableclick() { }
+
+        </script>
+    
+  
+
+ 
+ 
+</body>
+</html>
